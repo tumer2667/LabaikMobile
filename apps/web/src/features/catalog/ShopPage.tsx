@@ -1,34 +1,16 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 
-import {
-  demoBrands,
-  demoCategories,
-  demoProducts,
-  getCategoryBySlug,
-  type DemoProduct,
-} from '@/entities/catalog/demo-data'
+import { fetchBrands, fetchCategories, fetchProducts } from '@/features/catalog/api'
 import { ProductCard } from '@/features/catalog/components/ProductCard'
 import { Button } from '@/shared/ui/Button'
 import { Reveal } from '@/shared/ui/Reveal'
+import { Skeleton } from '@/shared/ui/Skeleton'
 import { cn } from '@/shared/lib/cn'
 
 type SortKey = 'featured' | 'price-asc' | 'price-desc' | 'rating'
-
-function sortProducts(products: DemoProduct[], sort: SortKey): DemoProduct[] {
-  const next = [...products]
-  switch (sort) {
-    case 'price-asc':
-      return next.sort((a, b) => a.pricePkr - b.pricePkr)
-    case 'price-desc':
-      return next.sort((a, b) => b.pricePkr - a.pricePkr)
-    case 'rating':
-      return next.sort((a, b) => b.rating - a.rating)
-    default:
-      return next.sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
-  }
-}
 
 export function ShopPage() {
   const [params, setParams] = useSearchParams()
@@ -38,35 +20,36 @@ export function ShopPage() {
   const [sort, setSort] = useState<SortKey>('featured')
   const [query, setQuery] = useState('')
 
-  const filtered = useMemo(() => {
-    let list = demoProducts
-    if (category !== 'all') list = list.filter((p) => p.categorySlug === category)
-    if (brand !== 'all') list = list.filter((p) => p.brand === brand)
-    if (inStockOnly) list = list.filter((p) => p.inStock)
-    if (query.trim()) {
-      const q = query.toLowerCase()
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q) ||
-          p.shortDescription.toLowerCase().includes(q),
-      )
-    }
-    return sortProducts(list, sort)
-  }, [category, brand, inStockOnly, sort, query])
+  const categoriesQuery = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
+  const brandsQuery = useQuery({ queryKey: ['brands'], queryFn: fetchBrands })
+  const productsQuery = useQuery({
+    queryKey: ['products', category, brand, inStockOnly, sort, query],
+    queryFn: () =>
+      fetchProducts({
+        category: category === 'all' ? undefined : category,
+        brand: brand === 'all' ? undefined : brand,
+        in_stock: inStockOnly ? true : undefined,
+        sort,
+        q: query.trim() || undefined,
+        page_size: 48,
+      }),
+  })
 
-  const activeCategory = category !== 'all' ? getCategoryBySlug(category) : undefined
-  const categoryHidesPrice = activeCategory != null && !activeCategory.showPrice
+  const activeCategory = useMemo(
+    () => categoriesQuery.data?.find((c) => c.slug === category),
+    [categoriesQuery.data, category],
+  )
+  const categoryHidesPrice = activeCategory != null && !activeCategory.show_price
+  const products = productsQuery.data?.items ?? []
 
   const setCategory = (slug: string) => {
     const next = new URLSearchParams(params)
     if (slug === 'all') next.delete('category')
     else next.set('category', slug)
     setParams(next, { replace: true })
-    // Price sort is meaningless when the category hides prices
     if (slug !== 'all') {
-      const cat = getCategoryBySlug(slug)
-      if (cat && !cat.showPrice && (sort === 'price-asc' || sort === 'price-desc')) {
+      const cat = categoriesQuery.data?.find((c) => c.slug === slug)
+      if (cat && !cat.show_price && (sort === 'price-asc' || sort === 'price-desc')) {
         setSort('featured')
       }
     }
@@ -84,8 +67,8 @@ export function ShopPage() {
               Mobile essentials
             </h1>
             <p className="mt-2 max-w-xl text-ink-secondary">
-              Demo catalog with placeholder imagery. Final photos will be managed in Admin and
-              stored on Supabase. Contact us to order — prices in PKR.
+              Live catalog from the API. Contact us to order — prices in PKR when the category
+              allows.
             </p>
           </div>
           <Link to="/contact">
@@ -97,9 +80,7 @@ export function ShopPage() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[240px_1fr]">
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-              Search
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Search</p>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -116,7 +97,7 @@ export function ShopPage() {
               <FilterChip active={category === 'all'} onClick={() => setCategory('all')}>
                 All
               </FilterChip>
-              {demoCategories.map((c) => (
+              {(categoriesQuery.data ?? []).map((c) => (
                 <FilterChip
                   key={c.id}
                   active={category === c.slug}
@@ -136,9 +117,9 @@ export function ShopPage() {
               className="mt-2 w-full rounded-xl border border-border bg-surface-elevated px-3.5 py-2.5 text-sm outline-none focus:border-brand-blue focus:shadow-focus"
             >
               <option value="all">All brands</option>
-              {demoBrands.map((b) => (
-                <option key={b} value={b}>
-                  {b}
+              {(brandsQuery.data ?? []).map((b) => (
+                <option key={b.id} value={b.slug}>
+                  {b.name}
                 </option>
               ))}
             </select>
@@ -156,16 +137,17 @@ export function ShopPage() {
         </aside>
 
         <div>
-          {categoryHidesPrice && (
+          {categoryHidesPrice && activeCategory && (
             <div className="mb-6 rounded-xl border border-brand-blue/25 bg-brand-blue-soft px-4 py-3 text-sm text-ink">
               <span className="font-semibold">{activeCategory.name}</span> has storefront prices
-              turned off (admin category setting). Customers see “Contact for price” instead.
+              turned off. Customers see “Contact for price”.
             </div>
           )}
 
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-ink-muted">
-              {filtered.length} product{filtered.length === 1 ? '' : 's'}
+              {productsQuery.data?.meta.total ?? 0} product
+              {(productsQuery.data?.meta.total ?? 0) === 1 ? '' : 's'}
             </p>
             <select
               value={sort}
@@ -183,40 +165,44 @@ export function ShopPage() {
             </select>
           </div>
 
-          <AnimatePresence mode="popLayout">
-            {filtered.length === 0 ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="rounded-xl border border-dashed border-border-strong bg-surface-elevated/60 px-6 py-16 text-center"
-              >
-                <p className="font-display text-lg font-semibold text-ink">No matches</p>
-                <p className="mt-2 text-sm text-ink-muted">Try clearing filters or search.</p>
-                <Button
-                  className="mt-6"
-                  variant="secondary"
-                  onClick={() => {
-                    setCategory('all')
-                    setBrand('all')
-                    setInStockOnly(false)
-                    setQuery('')
-                  }}
+          {productsQuery.isLoading ? (
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4] w-full rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {products.length === 0 ? (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="rounded-xl border border-dashed border-border-strong bg-surface-elevated/60 px-6 py-16 text-center"
                 >
-                  Reset filters
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.div
-                layout
-                className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
-              >
-                {filtered.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <p className="font-display text-lg font-semibold text-ink">No matches</p>
+                  <Button
+                    className="mt-6"
+                    variant="secondary"
+                    onClick={() => {
+                      setCategory('all')
+                      setBrand('all')
+                      setInStockOnly(false)
+                      setQuery('')
+                    }}
+                  >
+                    Reset filters
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div layout className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
         </div>
       </div>
     </div>

@@ -1,0 +1,154 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState, type ReactNode } from 'react'
+
+import type { Brand } from '@/entities/catalog/types'
+import { createBrand, fetchAdminBrands, updateBrand } from '@/features/catalog/api'
+import { Card } from '@/shared/ui/Card'
+import { Button } from '@/shared/ui/Button'
+import { Skeleton } from '@/shared/ui/Skeleton'
+import { getApiErrorMessage } from '@/shared/api/client'
+
+export function AdminBrandsPage() {
+  const queryClient = useQueryClient()
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin', 'brands'],
+    queryFn: fetchAdminBrands,
+  })
+  const [name, setName] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [editing, setEditing] = useState<Brand | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editActive, setEditActive] = useState(true)
+  const [editError, setEditError] = useState<string | null>(null)
+
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'brands'] })
+    void queryClient.invalidateQueries({ queryKey: ['brands'] })
+  }
+
+  const createMutation = useMutation({
+    mutationFn: () => createBrand({ name }),
+    onSuccess: () => {
+      setName('')
+      setError(null)
+      invalidate()
+    },
+    onError: (err) => setError(getApiErrorMessage(err)),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: () => {
+      if (!editing) throw new Error('No brand selected')
+      return updateBrand(editing.id, { name: editName.trim(), is_active: editActive })
+    },
+    onSuccess: () => {
+      setEditing(null)
+      setEditError(null)
+      invalidate()
+    },
+    onError: (err) => setEditError(getApiErrorMessage(err)),
+  })
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-ink">Brands</h1>
+        <p className="mt-1 text-sm text-ink-secondary">Create and edit brands used by products.</p>
+      </div>
+
+      <Card className="flex flex-wrap items-end gap-3">
+        <label className="min-w-[220px] flex-1 text-sm font-medium text-ink">
+          New brand
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-border px-3 py-2.5 text-sm outline-none focus:border-brand-blue"
+            placeholder="e.g. Spigen"
+          />
+        </label>
+        <Button
+          disabled={!name.trim() || createMutation.isPending}
+          onClick={() => createMutation.mutate()}
+        >
+          Add brand
+        </Button>
+        {error ? <p className="w-full text-sm text-danger">{error}</p> : null}
+      </Card>
+
+      {editing ? (
+        <Card className="space-y-4 border-brand-blue/30">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-semibold text-ink">Edit brand</h2>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>
+              Close
+            </Button>
+          </div>
+          <Field label="Name">
+            <input
+              className="mt-1.5 w-full rounded-xl border border-border px-3 py-2.5 text-sm outline-none focus:border-brand-blue"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+            />
+          </Field>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={editActive}
+              onChange={(e) => setEditActive(e.target.checked)}
+            />
+            Active
+          </label>
+          {editError ? <p className="text-sm text-danger">{editError}</p> : null}
+          <Button
+            disabled={updateMutation.isPending || !editName.trim()}
+            onClick={() => updateMutation.mutate()}
+          >
+            Save changes
+          </Button>
+        </Card>
+      ) : null}
+
+      <Card className="overflow-hidden !p-0">
+        {isLoading ? (
+          <div className="space-y-2 p-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {(data ?? []).map((b) => (
+              <li key={b.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div>
+                  <p className="font-medium text-ink">{b.name}</p>
+                  <p className="text-xs text-ink-muted">
+                    {b.slug} · {b.is_active ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setEditing(b)
+                    setEditName(b.name)
+                    setEditActive(b.is_active)
+                    setEditError(null)
+                  }}
+                >
+                  Edit
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block text-sm font-medium text-ink">
+      {label}
+      {children}
+    </label>
+  )
+}
