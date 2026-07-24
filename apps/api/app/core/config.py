@@ -5,6 +5,16 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def normalize_database_url(url: str) -> str:
+    """Accept Supabase/Render postgres URLs and force the psycopg driver."""
+    value = url.strip()
+    if value.startswith("postgres://"):
+        value = "postgresql+psycopg://" + value[len("postgres://") :]
+    elif value.startswith("postgresql://") and "+psycopg" not in value.split("://", 1)[0]:
+        value = "postgresql+psycopg://" + value[len("postgresql://") :]
+    return value
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -19,7 +29,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     api_prefix: str = "/api/v1"
 
-    # Comma-separated origins, e.g. http://localhost:5173,https://labaikmobiles.vercel.app
+    # Comma-separated origins, e.g. http://localhost:5173,https://labaik-mobile.vercel.app
     cors_origins_raw: str = Field(
         default="http://localhost:5173,http://127.0.0.1:5173",
         alias="CORS_ORIGINS",
@@ -58,6 +68,11 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_log_level(cls, value: str) -> str:
         return value.upper()
+
+    @field_validator("database_url")
+    @classmethod
+    def coerce_database_url(cls, value: str) -> str:
+        return normalize_database_url(value)
 
     @property
     def cors_origins(self) -> list[str]:

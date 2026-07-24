@@ -46,24 +46,21 @@ npm run dev
 
 App: [http://127.0.0.1:5173](http://127.0.0.1:5173)
 
-## Deploy (Vercel)
+## Deploy (free)
 
-The Vite app lives in `apps/web`. From the **repo root**, `vercel.json` installs and builds that app and publishes `apps/web/dist`.
+Step-by-step: **[docs/DEPLOY.md](docs/DEPLOY.md)**
 
-**Preferred dashboard setting:** Project → Settings → General → **Root Directory** = `apps/web`  
-(then Vercel uses `apps/web/vercel.json` only). If Root Directory stays `/`, the root `vercel.json` handles the paths.
-
-Set `VITE_API_BASE_URL` (or whatever `apps/web/.env.example` defines) in Vercel Environment Variables so the storefront can reach the API.
+Order: **Supabase (DB) → Render (API) → Vercel (web)**.
 
 ## Phase status
 
 | Phase | Status |
 |-------|--------|
 | 1 Architecture | Done |
-| 2 Foundation (scaffold, tokens, layouts, health) | Done |
+| 2 Foundation | Done |
 | 3 Auth + Admin portal | Done |
-| 4 Catalog API + Admin CRUD | **Current** |
-| 5 Polish / deploy / storage uploads | Planned |
+| 4 Catalog API + Admin CRUD | Done |
+| 5 Polish / deploy / storage uploads | **In progress** (deploy guide ready; Storage uploads later) |
 
 ## Product decisions (locked)
 
