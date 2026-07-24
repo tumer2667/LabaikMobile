@@ -21,8 +21,10 @@ export type Product = {
   id: string
   name: string
   slug: string
+  brand_id: string
   brand: string
   brand_slug: string
+  category_id: string
   category_slug: string
   category_name: string
   show_price: boolean

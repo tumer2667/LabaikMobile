@@ -11,7 +11,9 @@ import { AdminLayout } from '@/features/admin/AdminLayout'
 import { AdminLoginPage } from '@/features/admin/AdminLoginPage'
 import { AdminDashboardPage } from '@/features/admin/AdminDashboardPage'
 import { AdminProductsPage } from '@/features/admin/AdminProductsPage'
+import { AdminProductFormPage } from '@/features/admin/AdminProductFormPage'
 import { AdminCategoriesPage } from '@/features/admin/AdminCategoriesPage'
+import { AdminBrandsPage } from '@/features/admin/AdminBrandsPage'
 import { AdminOrdersPage, AdminSettingsPage } from '@/features/admin/AdminPlaceholderPages'
 import { RequireAdmin } from '@/features/admin/RequireAdmin'
 
@@ -45,7 +47,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'products', element: <AdminProductsPage /> },
+      { path: 'products/new', element: <AdminProductFormPage /> },
+      { path: 'products/:id/edit', element: <AdminProductFormPage /> },
       { path: 'categories', element: <AdminCategoriesPage /> },
+      { path: 'brands', element: <AdminBrandsPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
     ],

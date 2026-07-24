@@ -67,6 +67,11 @@ export async function fetchAdminProducts(params: ProductListParams = {}): Promis
   return data
 }
 
+export async function fetchAdminProduct(id: string): Promise<ProductDetail> {
+  const { data } = await apiClient.get<ProductDetail>(`/admin/products/id/${id}`)
+  return data
+}
+
 export async function createProduct(payload: Record<string, unknown>): Promise<ProductDetail> {
   const { data } = await apiClient.post<ProductDetail>('/admin/products', payload)
   return data
@@ -82,4 +87,20 @@ export async function updateProduct(
 
 export async function archiveProduct(id: string): Promise<void> {
   await apiClient.delete(`/admin/products/${id}`)
+}
+
+export async function createBrand(payload: {
+  name: string
+  is_active?: boolean
+}): Promise<Brand> {
+  const { data } = await apiClient.post<Brand>('/admin/brands', payload)
+  return data
+}
+
+export async function updateBrand(
+  id: string,
+  payload: Partial<{ name: string; is_active: boolean }>,
+): Promise<Brand> {
+  const { data } = await apiClient.patch<Brand>(`/admin/brands/${id}`, payload)
+  return data
 }

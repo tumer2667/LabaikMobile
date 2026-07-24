@@ -2,26 +2,34 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 
-import { demoCategories, getFeaturedProducts } from '@/entities/catalog/demo-data'
+import { fetchCategories, fetchProducts } from '@/features/catalog/api'
+import { fetchHealth } from '@/shared/api/health'
 import { CategoryCard } from '@/features/catalog/components/CategoryCard'
 import { ProductCard } from '@/features/catalog/components/ProductCard'
-import { fetchHealth } from '@/shared/api/health'
 import { appConfig } from '@/shared/config/env'
 import { Button } from '@/shared/ui/Button'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Reveal } from '@/shared/ui/Reveal'
+import { Skeleton } from '@/shared/ui/Skeleton'
 import { fadeUp, staggerContainer } from '@/shared/lib/motion'
 
 const heroImage =
   'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=1600&q=80'
 
 export function HomePage() {
-  const featured = getFeaturedProducts().slice(0, 8)
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: fetchHealth,
     retry: false,
   })
+  const categoriesQuery = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
+  const featuredQuery = useQuery({
+    queryKey: ['products', 'featured'],
+    queryFn: () => fetchProducts({ featured: true, page_size: 8 }),
+  })
+
+  const categories = categoriesQuery.data ?? []
+  const featured = featuredQuery.data?.items ?? []
 
   return (
     <div>
@@ -92,12 +100,10 @@ export function HomePage() {
                   API {healthQuery.data.status.toUpperCase()} · {healthQuery.data.currency}
                 </p>
               ) : (
-                <p className="mt-2 text-sm text-white/70">
-                  Demo UI ready — start the API to show live health.
-                </p>
+                <p className="mt-2 text-sm text-white/70">Connecting to catalog API…</p>
               )}
               <p className="mt-2 text-xs text-white/50">
-                Images are demo placeholders. Production uploads via Admin → Supabase Storage.
+                Catalog is live. Images can be replaced via Admin (URL now, Storage next).
               </p>
             </div>
           </Reveal>
@@ -122,13 +128,21 @@ export function HomePage() {
               </Link>
             </div>
           </Reveal>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {demoCategories.map((category, index) => (
-              <Reveal key={category.id} delay={index * 0.03}>
-                <CategoryCard category={category} />
-              </Reveal>
-            ))}
-          </div>
+          {categoriesQuery.isLoading ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.map((category, index) => (
+                <Reveal key={category.id} delay={index * 0.03}>
+                  <CategoryCard category={category} />
+                </Reveal>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -151,13 +165,21 @@ export function HomePage() {
               </Link>
             </div>
           </Reveal>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((product, index) => (
-              <Reveal key={product.id} delay={index * 0.04}>
-                <ProductCard product={product} />
-              </Reveal>
-            ))}
-          </div>
+          {featuredQuery.isLoading ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {featured.map((product, index) => (
+                <Reveal key={product.id} delay={index * 0.04}>
+                  <ProductCard product={product} />
+                </Reveal>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

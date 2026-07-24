@@ -7,7 +7,13 @@ export async function adminLogin(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function fetchAdminDashboard(): Promise<{
-  stats: { products: number; categories: number; orders: number; customers: number }
+  stats: {
+    products: number
+    categories: number
+    brands?: number
+    orders: number
+    customers: number
+  }
   notes: string[]
 }> {
   const { data } = await apiClient.get('/admin/dashboard')

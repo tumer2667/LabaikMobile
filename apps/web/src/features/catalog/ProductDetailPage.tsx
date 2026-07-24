@@ -1,33 +1,56 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 
-import { demoProducts, getProductBySlug, productShowsPrice } from '@/entities/catalog/demo-data'
+import { fetchProduct, fetchProducts } from '@/features/catalog/api'
 import { ProductCard } from '@/features/catalog/components/ProductCard'
 import { ProductPrice } from '@/features/catalog/components/ProductPrice'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Button } from '@/shared/ui/Button'
 import { Reveal } from '@/shared/ui/Reveal'
+import { Skeleton } from '@/shared/ui/Skeleton'
 import { cn } from '@/shared/lib/cn'
 
 export function ProductDetailPage() {
   const { slug = '' } = useParams()
-  const product = getProductBySlug(slug)
+  const productQuery = useQuery({
+    queryKey: ['product', slug],
+    queryFn: () => fetchProduct(slug),
+    enabled: Boolean(slug),
+  })
+  const product = productQuery.data
   const [activeImage, setActiveImage] = useState(0)
-  const [color, setColor] = useState(product?.colors[0] ?? '')
+  const [color, setColor] = useState<string>('')
 
-  const related = useMemo(() => {
-    if (!product) return []
-    return demoProducts
-      .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
-      .slice(0, 4)
-  }, [product])
+  const relatedQuery = useQuery({
+    queryKey: ['products', 'related', product?.category_slug],
+    queryFn: () =>
+      fetchProducts({ category: product!.category_slug, page_size: 8 }),
+    enabled: Boolean(product?.category_slug),
+  })
 
-  if (!product) {
+  const related = useMemo(
+    () => (relatedQuery.data?.items ?? []).filter((p) => p.slug !== slug).slice(0, 4),
+    [relatedQuery.data, slug],
+  )
+
+  if (productQuery.isLoading) {
+    return (
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 lg:grid-cols-2">
+        <Skeleton className="aspect-square w-full rounded-2xl" />
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-2/3" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  if (productQuery.isError || !product) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:px-6">
         <h1 className="font-display text-3xl font-semibold">Product not found</h1>
-        <p className="mt-2 text-ink-muted">This demo item may have been removed.</p>
         <Link to="/shop" className="mt-8 inline-block">
           <Button>Back to shop</Button>
         </Link>
@@ -35,6 +58,7 @@ export function ProductDetailPage() {
     )
   }
 
+  const selectedColor = color || product.colors[0] || ''
   const image = product.images[activeImage] ?? product.images[0] ?? ''
 
   return (
@@ -45,10 +69,10 @@ export function ProductDetailPage() {
         </Link>
         <span className="mx-2">/</span>
         <Link
-          to={`/shop?category=${product.categorySlug}`}
+          to={`/shop?category=${product.category_slug}`}
           className="capitalize hover:text-brand-blue"
         >
-          {product.categorySlug.replace(/-/g, ' ')}
+          {product.category_name}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-ink">{product.name}</span>
@@ -66,12 +90,7 @@ export function ProductDetailPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <ProductImage
-                    src={image}
-                    alt={product.name}
-                    priority
-                    className="aspect-square"
-                  />
+                  <ProductImage src={image} alt={product.name} priority className="aspect-square" />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -104,15 +123,15 @@ export function ProductDetailPage() {
               <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {product.name}
               </h1>
-              <p className="mt-3 text-ink-secondary">{product.shortDescription}</p>
+              <p className="mt-3 text-ink-secondary">{product.short_description}</p>
               <p className="mt-3 text-sm text-ink-muted">
-                ★ {product.rating.toFixed(1)} · {product.reviewCount} reviews
+                ★ {product.rating.toFixed(1)} · {product.review_count} reviews
               </p>
             </div>
 
             <div className="space-y-2">
               <ProductPrice product={product} size="lg" />
-              {!productShowsPrice(product) && (
+              {!product.show_price && (
                 <p className="text-sm text-ink-muted">
                   Pricing for this category is hidden — contact us for a quote.
                 </p>
@@ -122,17 +141,17 @@ export function ProductDetailPage() {
             <p
               className={cn(
                 'inline-flex rounded-full px-3 py-1 text-sm font-medium',
-                product.inStock
+                product.in_stock
                   ? 'bg-brand-green-soft text-brand-green-hover'
                   : 'bg-border text-ink-muted',
               )}
             >
-              {product.inStock ? 'In stock' : 'Currently unavailable'}
+              {product.in_stock ? 'In stock' : 'Currently unavailable'}
             </p>
 
             {product.colors.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-ink">Color: {color}</p>
+                <p className="text-sm font-medium text-ink">Color: {selectedColor}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {product.colors.map((c) => (
                     <button
@@ -141,7 +160,7 @@ export function ProductDetailPage() {
                       onClick={() => setColor(c)}
                       className={cn(
                         'rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 transition',
-                        color === c
+                        selectedColor === c
                           ? 'bg-brand-blue-soft text-brand-blue ring-brand-blue'
                           : 'bg-surface-elevated text-ink-secondary ring-border hover:ring-border-strong',
                       )}
@@ -167,12 +186,9 @@ export function ProductDetailPage() {
             <p className="leading-relaxed text-ink-secondary">{product.description}</p>
 
             <div className="flex flex-wrap gap-3 border-t border-border pt-6">
-              <Link
-                to="/contact"
-                state={{ productName: product.name, color }}
-              >
-                <Button size="lg" disabled={!product.inStock}>
-                  {productShowsPrice(product) ? 'Contact to order' : 'Request a quote'}
+              <Link to="/contact" state={{ productName: product.name, color: selectedColor }}>
+                <Button size="lg" disabled={!product.in_stock}>
+                  {product.show_price ? 'Contact to order' : 'Request a quote'}
                 </Button>
               </Link>
               <Link to="/shop">
@@ -181,10 +197,6 @@ export function ProductDetailPage() {
                 </Button>
               </Link>
             </div>
-            <p className="text-xs text-ink-muted">
-              No online checkout — we confirm availability and complete orders via contact.
-              Product photos are demo placeholders until Admin uploads go live.
-            </p>
           </div>
         </Reveal>
       </div>
