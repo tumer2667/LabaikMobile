@@ -85,8 +85,12 @@ export async function updateProduct(
   return data
 }
 
-export async function archiveProduct(id: string): Promise<void> {
+export async function deleteProduct(id: string): Promise<void> {
   await apiClient.delete(`/admin/products/${id}`)
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  await apiClient.delete(`/admin/categories/${id}`)
 }
 
 export async function createBrand(payload: {
@@ -103,4 +107,8 @@ export async function updateBrand(
 ): Promise<Brand> {
   const { data } = await apiClient.patch<Brand>(`/admin/brands/${id}`, payload)
   return data
+}
+
+export async function deleteBrand(id: string): Promise<void> {
+  await apiClient.delete(`/admin/brands/${id}`)
 }

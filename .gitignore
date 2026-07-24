@@ -38,3 +38,4 @@ coverage/
 
 # Alembic local
 apps/api/*.db
+*.db

@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react'
 import type { Category } from '@/entities/catalog/types'
 import {
   createCategory,
+  deleteCategory,
   fetchAdminCategories,
   updateCategory,
 } from '@/features/catalog/api'
@@ -75,6 +76,19 @@ export function AdminCategoriesPage() {
       invalidate()
     },
     onError: (err) => setEditError(getApiErrorMessage(err)),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteCategory(id),
+    onSuccess: () => {
+      setError(null)
+      if (editing) {
+        setEditing(null)
+        setEditForm(null)
+      }
+      invalidate()
+    },
+    onError: (err) => setError(getApiErrorMessage(err)),
   })
 
   const openEdit = (c: Category) => {
@@ -220,9 +234,28 @@ export function AdminCategoriesPage() {
                     className="size-4 accent-brand-blue"
                   />
                 </label>
-                <Button size="sm" className="w-full" onClick={() => openEdit(c)}>
-                  Edit
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" className="flex-1" onClick={() => openEdit(c)}>
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="flex-1 text-danger hover:bg-red-50"
+                    disabled={deleteMutation.isPending}
+                    onClick={() => {
+                      if (
+                        confirm(
+                          `Delete category “${c.name}”? Only works if no products use it.`,
+                        )
+                      ) {
+                        deleteMutation.mutate(c.id)
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

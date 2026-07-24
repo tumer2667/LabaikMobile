@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 
 import type { Brand } from '@/entities/catalog/types'
-import { createBrand, fetchAdminBrands, updateBrand } from '@/features/catalog/api'
+import { createBrand, deleteBrand, fetchAdminBrands, updateBrand } from '@/features/catalog/api'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
 import { Skeleton } from '@/shared/ui/Skeleton'
@@ -47,6 +47,16 @@ export function AdminBrandsPage() {
       invalidate()
     },
     onError: (err) => setEditError(getApiErrorMessage(err)),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteBrand(id),
+    onSuccess: () => {
+      setError(null)
+      setEditing(null)
+      invalidate()
+    },
+    onError: (err) => setError(getApiErrorMessage(err)),
   })
 
   return (
@@ -124,17 +134,36 @@ export function AdminBrandsPage() {
                     {b.slug} · {b.is_active ? 'Active' : 'Inactive'}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setEditing(b)
-                    setEditName(b.name)
-                    setEditActive(b.is_active)
-                    setEditError(null)
-                  }}
-                >
-                  Edit
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setEditing(b)
+                      setEditName(b.name)
+                      setEditActive(b.is_active)
+                      setEditError(null)
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-danger hover:bg-red-50"
+                    disabled={deleteMutation.isPending}
+                    onClick={() => {
+                      if (
+                        confirm(
+                          `Delete brand “${b.name}”? Only works if no products use it.`,
+                        )
+                      ) {
+                        deleteMutation.mutate(b.id)
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>

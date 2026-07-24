@@ -6,8 +6,8 @@ from sqlalchemy import engine_from_config, pool
 from app.core.config import get_settings
 from app.infrastructure.db.session import Base
 
-# Import models here so metadata is populated (Phase 3+)
-# from app.infrastructure.db import models  # noqa: F401
+# Import models so metadata is registered for Alembic autogenerate
+from app.infrastructure.db import models as _models  # noqa: F401
 
 config = context.config
 settings = get_settings()

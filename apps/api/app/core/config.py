@@ -49,6 +49,11 @@ class Settings(BaseSettings):
     currency_code: str = "PKR"
     default_locale: str = "en"
 
+    # Seeded on API startup if missing (change in production).
+    admin_email: str = Field(default="admin@labaikmobiles.com", alias="ADMIN_EMAIL")
+    admin_password: str = Field(default="Admin123!", alias="ADMIN_PASSWORD")
+    admin_full_name: str = Field(default="Labaik Admin", alias="ADMIN_FULL_NAME")
+
     @field_validator("log_level")
     @classmethod
     def normalize_log_level(cls, value: str) -> str:
