@@ -238,33 +238,6 @@ export function HomePage() {
           )}
         </div>
       </section>
-
-      <section className="relative overflow-hidden py-20 sm:py-24">
-        <div className="absolute inset-0 bg-ink" />
-        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-        <div className="pointer-events-none absolute -left-10 top-10 h-56 w-56 rounded-full bg-brand-blue/40 blur-3xl" />
-        <div className="pointer-events-none absolute -right-10 bottom-0 h-56 w-56 rounded-full bg-brand-green/35 blur-3xl" />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <Reveal>
-            <div className="max-w-xl">
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Ready to buy?
-              </h2>
-              <p className="mt-3 text-white/70">
-                No online payment on this site. Just tell us what you want — we check stock and
-                help you finish the order.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <Link to="/contact">
-              <Button size="lg" variant="gradient">
-                Contact us
-              </Button>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
     </div>
   )
 }
