@@ -58,34 +58,38 @@ export function ShopPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <Reveal>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
-              Shop
-            </p>
-            <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink">
-              Mobile essentials
-            </h1>
-            <p className="mt-2 max-w-xl text-ink-secondary">
-              Live catalog from the API. Contact us to order — prices in PKR when the category
-              allows.
-            </p>
+        <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-surface-elevated p-6 shadow-soft sm:p-8">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-blue/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 left-10 h-40 w-40 rounded-full bg-brand-green/15 blur-3xl" />
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+                Shop
+              </p>
+              <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+                Mobile essentials
+              </h1>
+              <p className="mt-2 max-w-xl text-ink-secondary">
+                Browse phones and accessories. Contact us to order — prices in PKR when the
+                category allows.
+              </p>
+            </div>
+            <Link to="/contact">
+              <Button variant="gradient">Contact to order</Button>
+            </Link>
           </div>
-          <Link to="/contact">
-            <Button>Contact to order</Button>
-          </Link>
         </div>
       </Reveal>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+      <div className="mt-10 grid gap-8 lg:grid-cols-[260px_1fr]">
+        <aside className="space-y-6 rounded-2xl border border-border/80 bg-surface-elevated/80 p-5 shadow-soft backdrop-blur-sm lg:sticky lg:top-24 lg:self-start">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Search</p>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products…"
-              className="mt-2 w-full rounded-xl border border-border bg-surface-elevated px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-blue focus:shadow-focus"
+              className="mt-2 w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-blue focus:shadow-focus"
             />
           </div>
 
@@ -225,8 +229,8 @@ function FilterChip({
       className={cn(
         'rounded-full px-3.5 py-1.5 text-left text-sm font-medium transition',
         active
-          ? 'bg-brand-blue text-white shadow-soft'
-          : 'bg-surface-elevated text-ink-secondary ring-1 ring-border hover:bg-brand-blue-soft hover:text-ink',
+          ? 'bg-brand-gradient text-white shadow-glow-blue'
+          : 'bg-white text-ink-secondary ring-1 ring-border hover:bg-brand-blue-soft hover:text-ink',
       )}
     >
       {children}

@@ -12,11 +12,14 @@ type CategoryCardProps = {
 
 export function CategoryCard({ category, className }: CategoryCardProps) {
   return (
-    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+    <motion.div
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
       <Link
         to={`/shop?category=${category.slug}`}
         className={cn(
-          'group relative block overflow-hidden rounded-xl border border-border shadow-soft',
+          'group relative block overflow-hidden rounded-2xl border border-border/70 shadow-soft transition hover:shadow-lift',
           className,
         )}
       >
@@ -24,14 +27,22 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
           src={category.image_url ?? ''}
           alt={category.name}
           className="aspect-[4/3]"
-          imgClassName="transition duration-500 group-hover:scale-105"
+          imgClassName="transition duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-          <h3 className="font-display text-lg font-semibold">{category.name}</h3>
-          <p className="mt-0.5 text-sm text-white/75">
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent" />
+        <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
+          <div className="absolute inset-0 bg-gradient-to-tr from-brand-blue/25 to-brand-green/20" />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
+          <h3 className="font-display text-lg font-semibold tracking-tight sm:text-xl">
+            {category.name}
+          </h3>
+          <p className="mt-1 text-sm text-white/75">
             {category.product_count} products
             {!category.show_price ? ' · Price on request' : ''}
+          </p>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue opacity-0 transition group-hover:opacity-100">
+            Shop now →
           </p>
         </div>
       </Link>

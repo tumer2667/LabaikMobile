@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
+import { useRef } from 'react'
 
 import { fetchCategories, fetchProducts } from '@/features/catalog/api'
-import { fetchHealth } from '@/shared/api/health'
 import { CategoryCard } from '@/features/catalog/components/CategoryCard'
 import { ProductCard } from '@/features/catalog/components/ProductCard'
 import { appConfig } from '@/shared/config/env'
@@ -14,14 +14,23 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 import { fadeUp, staggerContainer } from '@/shared/lib/motion'
 
 const heroImage =
-  'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=1600&q=80'
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1800&q=80'
+
+const trustItems = [
+  { title: 'Curated gear', copy: 'Phones & accessories chosen for daily performance.' },
+  { title: 'PKR pricing', copy: 'Clear prices where enabled — quote when it matters.' },
+  { title: 'Personal ordering', copy: 'Contact us and we confirm stock for you.' },
+] as const
 
 export function HomePage() {
-  const healthQuery = useQuery({
-    queryKey: ['health'],
-    queryFn: fetchHealth,
-    retry: false,
+  const heroRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
   })
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.35])
+
   const categoriesQuery = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
   const featuredQuery = useQuery({
     queryKey: ['products', 'featured'],
@@ -33,96 +42,119 @@ export function HomePage() {
 
   return (
     <div>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
+      <section ref={heroRef} className="relative min-h-[88vh] overflow-hidden">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
           <ProductImage
             src={heroImage}
             alt=""
             priority
-            className="h-full min-h-[520px] w-full"
-            imgClassName="object-cover object-center"
+            className="h-full min-h-[88vh] w-full"
+            imgClassName="object-cover object-[center_30%] scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/70 to-ink/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/30" />
+        </motion.div>
+
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="animate-pulse-glow absolute -left-20 top-24 h-72 w-72 rounded-full bg-brand-blue/30 blur-3xl" />
+          <div className="animate-pulse-glow absolute -right-16 bottom-20 h-80 w-80 rounded-full bg-brand-green/25 blur-3xl [animation-delay:1.2s]" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-20 pt-24 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:pt-28">
+        <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-4 pb-20 pt-28 sm:px-6 lg:justify-center lg:pb-28 lg:pt-24">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="space-y-6 text-white"
+            className="max-w-2xl space-y-7 text-white"
           >
             <motion.p
               variants={fadeUp}
-              className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-blue"
+              className="inline-flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.22em] text-brand-blue"
             >
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-green shadow-[0_0_12px_#59bc46]" />
               {appConfig.name}
             </motion.p>
             <motion.h1
               variants={fadeUp}
-              className="font-display text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
+              className="font-display text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
             >
-              Premium mobile gear,{' '}
-              <span className="bg-gradient-to-r from-brand-blue to-brand-green bg-clip-text text-transparent">
-                simply ordered.
-              </span>
+              Mobile gear,{' '}
+              <span className="text-brand-gradient">refined.</span>
             </motion.h1>
             <motion.p
               variants={fadeUp}
-              className="max-w-xl text-base leading-relaxed text-white/80 sm:text-lg"
+              className="max-w-lg text-base leading-relaxed text-white/78 sm:text-lg"
             >
-              Phones, earbuds, cases, chargers, and more — curated for everyday performance.
-              Browse the catalog, then contact us to place your order in {appConfig.currency}.
+              Phones, earbuds, cases, and power — curated for everyday performance. Browse the
+              catalog, then contact us to order in {appConfig.currency}.
             </motion.p>
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-3 pt-1">
               <Link to="/shop">
-                <Button size="lg">Shop collection</Button>
+                <Button size="lg" variant="gradient">
+                  Explore shop
+                </Button>
               </Link>
               <Link to="/contact">
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="border-white/20 bg-white/10 text-white hover:bg-white/20"
+                  className="border-white/25 bg-white/10 text-white backdrop-blur-md hover:bg-white/20"
                 >
                   Contact to order
                 </Button>
               </Link>
             </motion.div>
           </motion.div>
+        </div>
 
-          <Reveal>
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
-                Platform
-              </p>
-              {healthQuery.isSuccess && healthQuery.data ? (
-                <p className="mt-2 font-display text-xl font-semibold text-white">
-                  API {healthQuery.data.status.toUpperCase()} · {healthQuery.data.currency}
-                </p>
-              ) : (
-                <p className="mt-2 text-sm text-white/70">Connecting to catalog API…</p>
-              )}
-              <p className="mt-2 text-xs text-white/50">
-                Catalog is live. Images can be replaced via Admin (URL now, Storage next).
-              </p>
-            </div>
-          </Reveal>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.8 }}
+          className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 text-white/50 sm:block"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+            className="flex flex-col items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]"
+          >
+            Scroll
+            <span className="h-8 w-px bg-gradient-to-b from-brand-blue to-transparent" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      <section className="relative z-10 -mt-8 px-4 sm:-mt-10 sm:px-6">
+        <div className="mx-auto grid max-w-6xl gap-3 sm:grid-cols-3">
+          {trustItems.map((item, index) => (
+            <Reveal key={item.title} delay={index * 0.06}>
+              <div className="glass-panel rounded-2xl p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-lift">
+                <p className="font-display text-base font-semibold text-ink">{item.title}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{item.copy}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      <section className="border-b border-border bg-surface-elevated/60 py-16">
+      <section className="py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
-            <div className="mb-8 flex items-end justify-between gap-4">
+            <div className="mb-10 flex items-end justify-between gap-4">
               <div>
-                <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+                  Categories
+                </p>
+                <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   Shop by category
                 </h2>
-                <p className="mt-2 text-ink-secondary">Eight accessory lines, one aesthetic.</p>
+                <p className="mt-2 max-w-md text-ink-secondary">
+                  Eight accessory lines. One premium experience.
+                </p>
               </div>
               <Link
                 to="/shop"
-                className="hidden text-sm font-semibold text-brand-blue hover:text-brand-blue-hover sm:inline"
+                className="hidden text-sm font-semibold text-brand-blue transition hover:text-brand-blue-hover sm:inline"
               >
                 View all →
               </Link>
@@ -131,13 +163,13 @@ export function HomePage() {
           {categoriesQuery.isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
+                <Skeleton key={i} className="aspect-[4/3] rounded-2xl" />
               ))}
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {categories.map((category, index) => (
-                <Reveal key={category.id} delay={index * 0.03}>
+                <Reveal key={category.id} delay={index * 0.04}>
                   <CategoryCard category={category} />
                 </Reveal>
               ))}
@@ -146,16 +178,21 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <section className="relative overflow-hidden border-y border-border bg-surface-elevated/80 py-20 sm:py-24">
+        <div className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-brand-green/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-brand-blue/10 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
-            <div className="mb-8 flex items-end justify-between gap-4">
+            <div className="mb-10 flex items-end justify-between gap-4">
               <div>
-                <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
-                  Featured picks
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
+                  Featured
+                </p>
+                <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                  Picks worth opening
                 </h2>
                 <p className="mt-2 text-ink-secondary">
-                  High-intent products with sale badges and stock states.
+                  High-intent products with live pricing rules.
                 </p>
               </div>
               <Link to="/shop">
@@ -168,13 +205,13 @@ export function HomePage() {
           {featuredQuery.isLoading ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[3/4] rounded-xl" />
+                <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
               ))}
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {featured.map((product, index) => (
-                <Reveal key={product.id} delay={index * 0.04}>
+                <Reveal key={product.id} delay={index * 0.05}>
                   <ProductCard product={product} />
                 </Reveal>
               ))}
@@ -183,22 +220,30 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-border bg-ink py-16 text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="max-w-xl">
-            <h2 className="font-display text-3xl font-semibold tracking-tight">
-              Ready when you are
-            </h2>
-            <p className="mt-2 text-white/70">
-              No cart checkout yet. Tell us what you need — we confirm stock and arrange payment
-              offline.
-            </p>
-          </div>
-          <Link to="/contact">
-            <Button size="lg" variant="accent">
-              Get in touch
-            </Button>
-          </Link>
+      <section className="relative overflow-hidden py-20 sm:py-24">
+        <div className="absolute inset-0 bg-ink" />
+        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
+        <div className="pointer-events-none absolute -left-10 top-10 h-56 w-56 rounded-full bg-brand-blue/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-10 bottom-0 h-56 w-56 rounded-full bg-brand-green/35 blur-3xl" />
+        <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <Reveal>
+            <div className="max-w-xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                Ready when you are
+              </h2>
+              <p className="mt-3 text-white/70">
+                No cart checkout. Tell us what you need — we confirm stock and arrange payment
+                offline.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <Link to="/contact">
+              <Button size="lg" variant="gradient">
+                Get in touch
+              </Button>
+            </Link>
+          </Reveal>
         </div>
       </section>
     </div>
