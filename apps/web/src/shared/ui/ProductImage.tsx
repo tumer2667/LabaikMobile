@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 import { cn } from '@/shared/lib/cn'
+import { resolveMediaUrl } from '@/shared/lib/mediaUrl'
 import { Skeleton } from '@/shared/ui/Skeleton'
 
 type ProductImageProps = {
@@ -19,8 +20,14 @@ export function ProductImage({
   imgClassName,
   priority = false,
 }: ProductImageProps) {
+  const resolved = resolveMediaUrl(src)
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    setLoaded(false)
+    setFailed(!resolved)
+  }, [resolved])
 
   return (
     <div className={cn('relative overflow-hidden bg-brand-blue-soft/40', className)}>
@@ -31,7 +38,8 @@ export function ProductImage({
         </div>
       ) : (
         <motion.img
-          src={src}
+          key={resolved}
+          src={resolved}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"

@@ -15,7 +15,6 @@ import { Card } from '@/shared/ui/Card'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { getApiErrorMessage } from '@/shared/api/client'
-import { appConfig } from '@/shared/config/env'
 
 type FormState = {
   name: string
@@ -135,12 +134,6 @@ export function AdminProductFormPage() {
     .split('\n')
     .map((s) => s.trim())
     .filter(Boolean)
-
-  const resolveImageSrc = (url: string) => {
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    const apiOrigin = appConfig.apiUrl.replace(/\/api\/v1\/?$/, '')
-    return `${apiOrigin}${url.startsWith('/') ? url : `/${url}`}`
-  }
 
   const onUploadFiles = async (files: FileList | null) => {
     if (!files?.length) return
@@ -312,7 +305,7 @@ export function AdminProductFormPage() {
                   key={`${url}-${index}`}
                   className="relative overflow-hidden rounded-xl border border-border bg-surface"
                 >
-                  <ProductImage src={resolveImageSrc(url)} alt="" className="aspect-square" />
+                  <ProductImage src={url} alt="" className="aspect-square" />
                   <button
                     type="button"
                     className="absolute right-2 top-2 rounded-full bg-ink/80 px-2 py-0.5 text-xs font-semibold text-white"

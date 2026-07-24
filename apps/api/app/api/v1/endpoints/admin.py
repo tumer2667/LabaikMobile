@@ -28,7 +28,7 @@ def dashboard(_admin: AdminUser, db: DbSession) -> dict:
         "stats": stats,
         "notes": [
             "Catalog is API-backed. Toggle category show_price to control storefront pricing.",
-            "Product images currently use URLs; Supabase Storage upload comes next.",
+            "Upload product images from Admin → Products (stored in Supabase Storage).",
         ],
     }
 

@@ -39,3 +39,6 @@ coverage/
 # Alembic local
 apps/api/*.db
 *.db
+
+# Local image uploads (dev fallback)
+apps/api/uploads/

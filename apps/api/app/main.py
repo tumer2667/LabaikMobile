@@ -2,10 +2,12 @@
 
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import api_v1_router
 from app.core.config import get_settings
@@ -66,6 +68,10 @@ app.add_middleware(
 
 app.include_router(api_v1_router, prefix="/api/v1")
 
+uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
+uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+
 app.add_exception_handler(AppError, app_error_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
@@ -76,5 +82,5 @@ def root() -> dict[str, str]:
     return {
         "name": settings.app_name,
         "version": settings.app_version,
-        "docs": "/docs" if settings.is_development else "disabled",
+        "docs": "/docs",
     }

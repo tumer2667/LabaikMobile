@@ -126,7 +126,17 @@ npm run dev
 
 ---
 
-## Common problems
+## Admin image uploads (Supabase Storage)
+
+1. Supabase → **Storage** → New bucket named `product-images` → **Public**
+2. Render API env:
+   - `SUPABASE_URL=https://ufmfvvvmrguouzhriurv.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY=` (Settings → API → service_role secret)
+   - `SUPABASE_STORAGE_BUCKET=product-images`
+3. Redeploy API
+4. Admin → Products → **Upload images** (no need to paste URLs)
+
+
 
 | Problem | Fix |
 |---------|-----|
