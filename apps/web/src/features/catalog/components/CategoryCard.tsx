@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-import type { DemoCategory } from '@/entities/catalog/demo-data'
+import type { Category } from '@/entities/catalog/types'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { cn } from '@/shared/lib/cn'
 
 type CategoryCardProps = {
-  category: DemoCategory
+  category: Category
   className?: string
 }
 
@@ -21,7 +21,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
         )}
       >
         <ProductImage
-          src={category.image}
+          src={category.image_url ?? ''}
           alt={category.name}
           className="aspect-[4/3]"
           imgClassName="transition duration-500 group-hover:scale-105"
@@ -30,8 +30,8 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
         <div className="absolute inset-x-0 bottom-0 p-4 text-white">
           <h3 className="font-display text-lg font-semibold">{category.name}</h3>
           <p className="mt-0.5 text-sm text-white/75">
-            {category.productCount} products
-            {!category.showPrice ? ' · Price on request' : ''}
+            {category.product_count} products
+            {!category.show_price ? ' · Price on request' : ''}
           </p>
         </div>
       </Link>

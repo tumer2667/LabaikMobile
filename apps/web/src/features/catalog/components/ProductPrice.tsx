@@ -1,10 +1,9 @@
-import type { DemoProduct } from '@/entities/catalog/demo-data'
-import { productShowsPrice } from '@/entities/catalog/demo-data'
+import type { Product } from '@/entities/catalog/types'
 import { formatPkr } from '@/shared/lib/money'
 import { cn } from '@/shared/lib/cn'
 
 type ProductPriceProps = {
-  product: Pick<DemoProduct, 'pricePkr' | 'compareAtPkr' | 'categorySlug'>
+  product: Pick<Product, 'price_pkr' | 'compare_at_pkr' | 'show_price'>
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
@@ -19,15 +18,10 @@ const sizeClasses = {
   },
 } as const
 
-/**
- * Renders PKR when the product's category has `showPrice: true`.
- * Otherwise shows “Contact for price” (admin category toggle).
- */
 export function ProductPrice({ product, size = 'md', className }: ProductPriceProps) {
-  const showPrice = productShowsPrice(product as DemoProduct)
   const styles = sizeClasses[size]
 
-  if (!showPrice) {
+  if (!product.show_price) {
     return (
       <span className={cn(styles.hidden, 'text-brand-blue', className)}>Contact for price</span>
     )
@@ -35,10 +29,10 @@ export function ProductPrice({ product, size = 'md', className }: ProductPricePr
 
   return (
     <div className={cn('flex flex-wrap items-baseline gap-2', className)}>
-      <span className={cn(styles.price, 'text-ink')}>{formatPkr(product.pricePkr)}</span>
-      {product.compareAtPkr != null && product.compareAtPkr > product.pricePkr ? (
+      <span className={cn(styles.price, 'text-ink')}>{formatPkr(product.price_pkr)}</span>
+      {product.compare_at_pkr != null && product.compare_at_pkr > product.price_pkr ? (
         <span className={cn(styles.compare, 'text-ink-muted line-through')}>
-          {formatPkr(product.compareAtPkr)}
+          {formatPkr(product.compare_at_pkr)}
         </span>
       ) : null}
     </div>
@@ -46,9 +40,9 @@ export function ProductPrice({ product, size = 'md', className }: ProductPricePr
 }
 
 export function productDiscountPercent(
-  product: Pick<DemoProduct, 'pricePkr' | 'compareAtPkr' | 'categorySlug'>,
+  product: Pick<Product, 'price_pkr' | 'compare_at_pkr' | 'show_price'>,
 ): number | null {
-  if (!productShowsPrice(product as DemoProduct)) return null
-  if (!product.compareAtPkr || product.compareAtPkr <= product.pricePkr) return null
-  return Math.round((1 - product.pricePkr / product.compareAtPkr) * 100)
+  if (!product.show_price) return null
+  if (!product.compare_at_pkr || product.compare_at_pkr <= product.price_pkr) return null
+  return Math.round((1 - product.price_pkr / product.compare_at_pkr) * 100)
 }

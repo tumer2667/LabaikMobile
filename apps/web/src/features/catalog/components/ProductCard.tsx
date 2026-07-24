@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-import type { DemoProduct } from '@/entities/catalog/demo-data'
+import type { Product } from '@/entities/catalog/types'
 import {
   ProductPrice,
   productDiscountPercent,
@@ -10,12 +10,13 @@ import { cn } from '@/shared/lib/cn'
 import { ProductImage } from '@/shared/ui/ProductImage'
 
 type ProductCardProps = {
-  product: DemoProduct
+  product: Product
   className?: string
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const discount = productDiscountPercent(product)
+  const image = product.primary_image ?? product.images[0] ?? ''
 
   return (
     <motion.article
@@ -30,13 +31,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
       >
         <div className="relative aspect-[4/5] overflow-hidden">
           <ProductImage
-            src={product.images[0] ?? ''}
+            src={image}
             alt={product.name}
             className="h-full w-full"
             imgClassName="transition duration-500 group-hover:scale-105"
           />
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            {product.isNew && (
+            {product.is_new && (
               <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
                 New
               </span>
@@ -46,7 +47,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 -{discount}%
               </span>
             )}
-            {!product.inStock && (
+            {!product.in_stock && (
               <span className="rounded-full bg-ink-secondary px-2.5 py-1 text-[11px] font-semibold text-white">
                 Sold out
               </span>
@@ -61,12 +62,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
           <h3 className="font-display text-base font-semibold tracking-tight text-ink line-clamp-1">
             {product.name}
           </h3>
-          <p className="line-clamp-2 text-sm text-ink-muted">{product.shortDescription}</p>
+          <p className="line-clamp-2 text-sm text-ink-muted">{product.short_description}</p>
           <div className="pt-1">
             <ProductPrice product={product} size="md" />
           </div>
           <p className="text-xs text-ink-muted">
-            ★ {product.rating.toFixed(1)} · {product.reviewCount} reviews
+            ★ {product.rating.toFixed(1)} · {product.review_count} reviews
           </p>
         </div>
       </Link>

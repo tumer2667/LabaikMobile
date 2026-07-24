@@ -52,11 +52,10 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/shop"
-            className="hidden sm:inline-flex h-9 items-center rounded-full border border-border bg-surface-elevated px-3.5 text-sm font-medium text-ink shadow-soft transition hover:border-border-strong"
-          >
-            Browse
+          <Link to="/shop" className="hidden sm:inline-flex">
+            <Button size="sm" variant="secondary">
+              Browse
+            </Button>
           </Link>
           <Link to="/contact">
             <Button size="sm">Get in touch</Button>
