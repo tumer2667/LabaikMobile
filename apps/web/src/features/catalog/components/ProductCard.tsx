@@ -6,6 +6,7 @@ import {
   ProductPrice,
   productDiscountPercent,
 } from '@/features/catalog/components/ProductPrice'
+import { orderWhatsAppHref } from '@/shared/lib/orderWhatsApp'
 import { cn } from '@/shared/lib/cn'
 import { ProductImage } from '@/shared/ui/ProductImage'
 
@@ -17,18 +18,29 @@ type ProductCardProps = {
 export function ProductCard({ product, className }: ProductCardProps) {
   const discount = productDiscountPercent(product)
   const image = product.primary_image ?? product.images[0] ?? ''
+  const productPath = `/shop/${product.slug}`
+  const whatsappHref = orderWhatsAppHref({
+    productName: product.name,
+    brand: product.brand,
+    category: product.category_name,
+    pricePkr: product.price_pkr,
+    showPrice: product.show_price,
+    askForPrice: !product.show_price,
+    productUrl:
+      typeof window !== 'undefined' ? `${window.location.origin}${productPath}` : productPath,
+  })
 
   return (
     <motion.article
       layout
       whileHover={{ y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={cn('group flex h-full', className)}
+      className={cn(
+        'group flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-surface-elevated shadow-soft transition-[box-shadow,border-color] duration-300 hover:border-brand-blue/35 hover:shadow-lift',
+        className,
+      )}
     >
-      <Link
-        to={`/shop/${product.slug}`}
-        className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-surface-elevated shadow-soft transition-[box-shadow,border-color] duration-300 hover:border-brand-blue/35 hover:shadow-lift"
-      >
+      <Link to={productPath} className="relative flex min-h-0 flex-1 flex-col">
         <div className="pointer-events-none absolute inset-0 z-10 opacity-0 transition duration-500 group-hover:opacity-100">
           <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/10 via-transparent to-brand-green/5" />
         </div>
@@ -60,7 +72,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </div>
         </div>
 
-        <div className="relative flex flex-1 flex-col p-4 sm:p-5">
+        <div className="relative flex flex-1 flex-col p-4 pb-2 sm:p-5 sm:pb-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
             {product.brand}
           </p>
@@ -78,6 +90,23 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </div>
         </div>
       </Link>
+
+      <div className="relative z-20 border-t border-border/70 px-4 py-3 sm:px-5">
+        {product.in_stock ? (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="flex w-full items-center justify-center rounded-full bg-brand-gradient px-3 py-2 text-sm font-semibold text-white shadow-glow-blue transition hover:brightness-105"
+          >
+            Order on WhatsApp
+          </a>
+        ) : (
+          <span className="flex w-full items-center justify-center rounded-full bg-border px-3 py-2 text-sm font-semibold text-ink-muted">
+            Out of stock
+          </span>
+        )}
+      </div>
     </motion.article>
   )
 }

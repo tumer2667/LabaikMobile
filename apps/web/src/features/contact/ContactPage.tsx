@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 
 import { businessInfo, mapsOpenUrl, whatsappUrl } from '@/shared/config/business'
 import { appConfig } from '@/shared/config/env'
+import { orderWhatsAppHref } from '@/shared/lib/orderWhatsApp'
 import { Reveal } from '@/shared/ui/Reveal'
 import { Button } from '@/shared/ui/Button'
 import { StoreMap } from '@/shared/ui/StoreMap'
@@ -10,25 +11,37 @@ import { StoreMap } from '@/shared/ui/StoreMap'
 type ContactState = {
   productName?: string
   color?: string
+  brand?: string
+  category?: string
+  pricePkr?: number
+  showPrice?: boolean
 }
 
 export function ContactPage() {
   const location = useLocation()
   const state = (location.state ?? {}) as ContactState
+  const hasProduct = Boolean(state.productName)
   const interest =
     state.productName != null
       ? `${state.productName}${state.color ? ` · ${state.color}` : ''}`
       : ''
 
   const mailHref = `mailto:${businessInfo.email}?subject=${encodeURIComponent(
-    interest ? `Order enquiry: ${interest}` : 'Order enquiry',
+    interest ? `Order: ${interest}` : 'Order enquiry',
   )}`
   const primary = businessInfo.phones[0]
   const secondary = businessInfo.phones[1]
-  const whatsappHref = whatsappUrl(
-    primary.whatsapp,
-    interest ? `Hi, I want to ask about: ${interest}` : 'Hi, I want to place an order.',
-  )
+  const whatsappHref = hasProduct
+    ? orderWhatsAppHref({
+        productName: state.productName!,
+        brand: state.brand,
+        category: state.category,
+        color: state.color,
+        pricePkr: state.pricePkr,
+        showPrice: state.showPrice,
+        askForPrice: state.showPrice === false,
+      })
+    : whatsappUrl(primary.whatsapp, 'Hi, I want to place an order.')
 
   const channels = [
     {
@@ -78,17 +91,26 @@ export function ContactPage() {
                   Contact
                 </p>
                 <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-                  Need something? <span className="text-brand-gradient">Message us.</span>
+                  {hasProduct ? (
+                    <>
+                      Order on <span className="text-brand-gradient">WhatsApp</span>
+                    </>
+                  ) : (
+                    <>
+                      Need something? <span className="text-brand-gradient">Message us.</span>
+                    </>
+                  )}
                 </h1>
                 <p className="mt-4 text-ink-secondary">
-                  Choose WhatsApp, call, email, or visit the shop. We check stock and help you order
-                  in {appConfig.currency}. No online payment here.
+                  {hasProduct
+                    ? 'Tap WhatsApp below. Your product details are already written in the message — just send it to us.'
+                    : `Choose WhatsApp, call, email, or visit the shop. We check stock and help you order in ${appConfig.currency}. No online payment here.`}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <a href={whatsappHref} target="_blank" rel="noreferrer">
                   <Button variant="gradient" size="lg">
-                    WhatsApp now
+                    {hasProduct ? 'Send order on WhatsApp' : 'WhatsApp now'}
                   </Button>
                 </a>
                 <a href={`tel:${primary.tel}`}>

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 
 import { fetchProduct, fetchProducts } from '@/features/catalog/api'
+import { OrderWhatsAppPanel } from '@/features/catalog/components/OrderWhatsAppPanel'
 import { ProductCard } from '@/features/catalog/components/ProductCard'
 import { ProductPrice } from '@/features/catalog/components/ProductPrice'
 import { ProductImage } from '@/shared/ui/ProductImage'
@@ -185,15 +186,24 @@ export function ProductDetailPage() {
 
             <p className="leading-relaxed text-ink-secondary">{product.description}</p>
 
-            <div className="flex flex-wrap gap-3 border-t border-border pt-6">
-              <Link to="/contact" state={{ productName: product.name, color: selectedColor }}>
-                <Button size="lg" variant="gradient" disabled={!product.in_stock}>
-                  {product.show_price ? 'Order this item' : 'Ask for price'}
-                </Button>
-              </Link>
+            <OrderWhatsAppPanel
+              inStock={product.in_stock}
+              order={{
+                productName: product.name,
+                brand: product.brand,
+                category: product.category_name,
+                color: selectedColor || undefined,
+                pricePkr: product.price_pkr,
+                showPrice: product.show_price,
+                askForPrice: !product.show_price,
+                productUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+              }}
+            />
+
+            <div className="pt-1">
               <Link to="/shop">
-                <Button size="lg" variant="secondary">
-                  Back to shop
+                <Button size="md" variant="ghost">
+                  ← Back to shop
                 </Button>
               </Link>
             </div>
