@@ -51,9 +51,10 @@ App: [http://127.0.0.1:5173](http://127.0.0.1:5173)
 | Phase | Status |
 |-------|--------|
 | 1 Architecture | Done |
-| 2 Foundation (scaffold, tokens, layouts, health) | **Current** |
-| 3 Auth | Next |
-| 4 Catalog | Planned |
+| 2 Foundation (scaffold, tokens, layouts, health) | Done |
+| 3 Auth + Admin portal | Done |
+| 4 Catalog API + Admin CRUD | **Current** |
+| 5 Polish / deploy / storage uploads | Planned |
 
 ## Product decisions (locked)
 

@@ -37,3 +37,21 @@ Gradients (`bg-brand-gradient`, `text-brand-gradient`) used sparingly for brand 
 - When `false`: UI shows **Contact for price** (no amount, no sale badges, no price sort for that category)
 - Prices remain stored on products for admin / quotes; only storefront display is gated
 - Demo: **Phones** and **Smart watches** have `showPrice: false`; accessories show prices
+
+## Auth (Phase 3)
+
+- JWT access (30m) + rotating refresh tokens (14d, hashed in DB)
+- **Storefront is public** — no customer login/register in the UI
+- Admin portal: `/admin/login` → `/admin/*`
+- Endpoints: `POST /auth/admin/login`, `GET /auth/me`, `GET /admin/dashboard`, `GET /admin/session`
+- Public `POST /auth/register` disabled
+- Admin user seeded on API startup (`ADMIN_EMAIL` / `ADMIN_PASSWORD`)
+- Local default DB: SQLite; production: Supabase Postgres
+
+## Catalog (Phase 4)
+
+- Tables: `brands`, `categories` (`show_price`), `products`, `product_images`
+- Public: `GET /categories`, `/brands`, `/products`, `/products/{slug}`
+- Admin: CRUD categories (incl. show_price toggle), brands, products (image URLs)
+- Seeded demo catalog on first boot
+- Storefront + admin UI consume API (no hardcoded demo dataset in pages)

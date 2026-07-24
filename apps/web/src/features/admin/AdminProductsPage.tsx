@@ -1,26 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
-import { archiveProduct, fetchAdminProducts } from '@/features/catalog/api'
+import { deleteProduct, fetchAdminProducts } from '@/features/catalog/api'
 import { formatPkr } from '@/shared/lib/money'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Skeleton } from '@/shared/ui/Skeleton'
+import { getApiErrorMessage } from '@/shared/api/client'
+import { useState } from 'react'
 
 export function AdminProductsPage() {
   const queryClient = useQueryClient()
+  const [actionError, setActionError] = useState<string | null>(null)
   const productsQuery = useQuery({
     queryKey: ['admin', 'products'],
     queryFn: () => fetchAdminProducts({ page_size: 100 }),
   })
 
-  const archiveMutation = useMutation({
-    mutationFn: (id: string) => archiveProduct(id),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () => {
+      setActionError(null)
       void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
       void queryClient.invalidateQueries({ queryKey: ['products'] })
     },
+    onError: (err) => setActionError(getApiErrorMessage(err)),
   })
 
   const products = productsQuery.data?.items ?? []
@@ -38,6 +43,10 @@ export function AdminProductsPage() {
           <Button>Add product</Button>
         </Link>
       </div>
+
+      {actionError ? (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-danger">{actionError}</p>
+      ) : null}
 
       <Card className="overflow-hidden !p-0">
         {productsQuery.isLoading ? (
@@ -95,12 +104,19 @@ export function AdminProductsPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-danger"
+                          className="text-danger hover:bg-red-50"
+                          disabled={deleteMutation.isPending}
                           onClick={() => {
-                            if (confirm(`Archive ${p.name}?`)) archiveMutation.mutate(p.id)
+                            if (
+                              confirm(
+                                `Delete “${p.name}” permanently? This cannot be undone.`,
+                              )
+                            ) {
+                              deleteMutation.mutate(p.id)
+                            }
                           }}
                         >
-                          Archive
+                          Delete
                         </Button>
                       </div>
                     </td>

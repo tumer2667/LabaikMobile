@@ -1,1 +1,11 @@
-# SQLAlchemy mapped models will be registered here in Phase 3+.
+from app.infrastructure.db.models.catalog import Brand, Category, Product, ProductImage
+from app.infrastructure.db.models.user import RefreshToken, User
+
+__all__ = [
+    "User",
+    "RefreshToken",
+    "Brand",
+    "Category",
+    "Product",
+    "ProductImage",
+]

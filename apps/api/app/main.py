@@ -28,6 +28,20 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         "starting_api",
         extra={"env": settings.app_env, "version": settings.app_version},
     )
+    from app.application.identity.bootstrap import ensure_admin_user
+    from app.application.catalog.seed import ensure_catalog_seed
+    from app.infrastructure.db.session import SessionLocal
+
+    db = SessionLocal()
+    try:
+        ensure_admin_user(db, settings)
+        ensure_catalog_seed(db)
+    except Exception:
+        logger.exception("startup_seed_failed")
+        raise
+    finally:
+        db.close()
+
     yield
     logger.info("shutting_down_api")
 
