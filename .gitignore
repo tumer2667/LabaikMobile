@@ -1,0 +1,40 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Coverage / build
+coverage/
+*.tsbuildinfo
+
+# Alembic local
+apps/api/*.db
