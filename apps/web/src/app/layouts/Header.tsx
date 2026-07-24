@@ -84,12 +84,12 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link to="/shop" className="hidden sm:inline-flex">
             <Button size="sm" variant="secondary">
-              Browse
+              Shop
             </Button>
           </Link>
           <Link to="/contact">
             <Button size="sm" variant="gradient">
-              Get in touch
+              Contact
             </Button>
           </Link>
         </div>

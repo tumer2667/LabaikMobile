@@ -67,15 +67,14 @@ export function ShopPage() {
                 Shop
               </p>
               <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-                Mobile essentials
+                Phones & accessories
               </h1>
               <p className="mt-2 max-w-xl text-ink-secondary">
-                Browse phones and accessories. Contact us to order — prices in PKR when the
-                category allows.
+                Look through our products. To buy, contact us — prices are in PKR.
               </p>
             </div>
             <Link to="/contact">
-              <Button variant="gradient">Contact to order</Button>
+              <Button variant="gradient">Order now</Button>
             </Link>
           </div>
         </div>
@@ -143,8 +142,8 @@ export function ShopPage() {
         <div>
           {categoryHidesPrice && activeCategory && (
             <div className="mb-6 rounded-xl border border-brand-blue/25 bg-brand-blue-soft px-4 py-3 text-sm text-ink">
-              <span className="font-semibold">{activeCategory.name}</span> has storefront prices
-              turned off. Customers see “Contact for price”.
+              <span className="font-semibold">{activeCategory.name}</span> — price is not shown
+              here. Customers see “Contact for price”. Ask us for the price.
             </div>
           )}
 
@@ -184,7 +183,7 @@ export function ShopPage() {
                   animate={{ opacity: 1 }}
                   className="rounded-xl border border-dashed border-border-strong bg-surface-elevated/60 px-6 py-16 text-center"
                 >
-                  <p className="font-display text-lg font-semibold text-ink">No matches</p>
+                  <p className="font-display text-lg font-semibold text-ink">No products found</p>
                   <Button
                     className="mt-6"
                     variant="secondary"
@@ -195,11 +194,11 @@ export function ShopPage() {
                       setQuery('')
                     }}
                   >
-                    Reset filters
+                    Clear filters
                   </Button>
                 </motion.div>
               ) : (
-                <motion.div layout className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <motion.div layout className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}

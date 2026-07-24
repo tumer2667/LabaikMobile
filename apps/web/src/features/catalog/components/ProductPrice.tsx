@@ -23,12 +23,14 @@ export function ProductPrice({ product, size = 'md', className }: ProductPricePr
 
   if (!product.show_price) {
     return (
-      <span className={cn(styles.hidden, 'text-brand-blue', className)}>Contact for price</span>
+      <span className={cn(styles.hidden, 'inline-flex min-h-[1.5rem] items-center text-brand-blue', className)}>
+        Contact for price
+      </span>
     )
   }
 
   return (
-    <div className={cn('flex flex-wrap items-baseline gap-2', className)}>
+    <div className={cn('flex min-h-[1.5rem] flex-wrap items-baseline gap-2', className)}>
       <span className={cn(styles.price, 'text-ink')}>{formatPkr(product.price_pkr)}</span>
       {product.compare_at_pkr != null && product.compare_at_pkr > product.price_pkr ? (
         <span className={cn(styles.compare, 'text-ink-muted line-through')}>

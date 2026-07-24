@@ -10,32 +10,31 @@ import { StoreMap } from '@/shared/ui/StoreMap'
 
 const values = [
   {
-    title: 'Curated, not cluttered',
-    copy: 'Phones, earbuds, cases, and power accessories chosen for everyday reliability — not endless SKU noise.',
+    title: 'Good quality items',
+    copy: 'We sell phones, earbuds, cases, and chargers that people use every day.',
     accent: 'from-brand-blue/20 to-brand-blue/5',
   },
   {
-    title: 'Clear PKR pricing',
-    copy: 'Where a category shows prices, you see them in PKR. Where it doesn’t, we quote you personally.',
+    title: 'Honest prices',
+    copy: 'Prices are in PKR. If a price is not shown, message us and we will tell you.',
     accent: 'from-brand-green/20 to-brand-green/5',
   },
   {
-    title: 'Human ordering',
-    copy: 'No cart checkout. Tell us what you need — we confirm stock and arrange payment offline.',
+    title: 'Order with us directly',
+    copy: 'No online cart. Call or WhatsApp — we check stock and help you buy.',
     accent: 'from-brand-blue/15 to-brand-green/10',
   },
 ] as const
 
 const journey = [
-  { step: '01', title: 'Browse', copy: 'Explore phones and accessories in the shop.' },
-  { step: '02', title: 'Reach out', copy: 'WhatsApp, call, or visit us in Karim Park.' },
-  { step: '03', title: 'Confirm', copy: 'We verify stock and finalize your order with you.' },
+  { step: '01', title: 'See products', copy: 'Open the shop and look at phones and accessories.' },
+  { step: '02', title: 'Message us', copy: 'WhatsApp, call, or visit our shop in Karim Park.' },
+  { step: '03', title: 'Place order', copy: 'We check stock and help you finish your order.' },
 ] as const
 
 export function AboutPage() {
   return (
     <div>
-      {/* Editorial hero — story, not contact duplicate */}
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="absolute inset-0 bg-brand-gradient opacity-[0.08]" />
         <div className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-brand-blue/20 blur-3xl" />
@@ -52,32 +51,31 @@ export function AboutPage() {
               variants={fadeUp}
               className="text-sm font-semibold uppercase tracking-[0.22em] text-brand-blue"
             >
-              Our story
+              About us
             </motion.p>
             <motion.h1
               variants={fadeUp}
               className="mt-4 font-display text-4xl font-semibold tracking-tight text-ink sm:text-6xl sm:leading-[1.05]"
             >
-              Mobile gear from a shop you can{' '}
-              <span className="text-brand-gradient">actually talk to.</span>
+              Your local mobile shop —{' '}
+              <span className="text-brand-gradient">easy to talk to.</span>
             </motion.h1>
             <motion.p
               variants={fadeUp}
               className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-secondary"
             >
-              {appConfig.name} is a Lahore storefront for phones and accessories — built for people
-              who want clear options, honest guidance, and a simple way to order without fighting a
-              checkout flow.
+              {appConfig.name} sells phones and accessories in Lahore. See products online, then
+              call, WhatsApp, or visit us to order. Simple, clear, and helpful.
             </motion.p>
             <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
               <Link to="/shop">
                 <Button variant="gradient" size="lg">
-                  Browse the catalog
+                  See products
                 </Button>
               </Link>
               <Link to="/contact">
                 <Button variant="secondary" size="lg">
-                  How to reach us
+                  Contact us
                 </Button>
               </Link>
             </motion.div>
@@ -85,15 +83,14 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Values */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
-              What we stand for
+              Why choose us
             </p>
             <h2 className="mt-2 max-w-xl font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-              Premium feel. Local trust.
+              Simple service. Local shop.
             </h2>
           </Reveal>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -112,15 +109,14 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Journey strip */}
       <section className="border-y border-border/70 bg-surface-elevated/50 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
-              How it works
+              How to buy
             </p>
             <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink">
-              Three steps. No cart drama.
+              Just 3 easy steps
             </h2>
           </Reveal>
           <div className="mt-12 grid gap-8 sm:grid-cols-3">
@@ -137,7 +133,6 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Visit teaser — map secondary, story primary */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="overflow-hidden rounded-[2rem] border border-border/80 bg-ink text-white shadow-lift">
@@ -146,13 +141,13 @@ export function AboutPage() {
                 <div className="absolute inset-0 bg-brand-gradient opacity-25" />
                 <div className="relative">
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
-                    Visit the shop
+                    Our shop
                   </p>
                   <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Find us in Karim Park
+                    Come visit us in Karim Park
                   </h2>
                   <p className="mt-4 max-w-md text-white/70">
-                    Drop by for hands-on advice, or message us first so we can check stock for you.
+                    Visit the shop, or message us first so we can check if the item is available.
                   </p>
                   <div className="mt-6 space-y-1 text-sm text-white/80">
                     {businessInfo.addressLines.map((line) => (
@@ -161,7 +156,7 @@ export function AboutPage() {
                   </div>
                   <div className="mt-8">
                     <Link to="/contact">
-                      <Button variant="gradient">Get directions & contact</Button>
+                      <Button variant="gradient">Location & contact</Button>
                     </Link>
                   </div>
                 </div>

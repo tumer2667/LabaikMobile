@@ -39,10 +39,10 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
           </h3>
           <p className="mt-1 text-sm text-white/75">
             {category.product_count} products
-            {!category.show_price ? ' · Price on request' : ''}
+            {!category.show_price ? ' · Ask for price' : ''}
           </p>
           <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue opacity-0 transition group-hover:opacity-100">
-            Shop now →
+            View items →
           </p>
         </div>
       </Link>

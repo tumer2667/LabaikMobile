@@ -17,9 +17,21 @@ const heroImage =
   'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1800&q=80'
 
 const trustItems = [
-  { title: 'Curated gear', copy: 'Phones & accessories chosen for daily performance.' },
-  { title: 'PKR pricing', copy: 'Clear prices where enabled — quote when it matters.' },
-  { title: 'Personal ordering', copy: 'Contact us and we confirm stock for you.' },
+  {
+    title: 'Good products',
+    copy: 'Phones, earbuds, cases, chargers — useful items for everyday use.',
+    accent: 'bg-brand-blue',
+  },
+  {
+    title: 'Clear prices',
+    copy: 'Prices shown in PKR. If price is hidden, just ask us — we tell you quickly.',
+    accent: 'bg-brand-green',
+  },
+  {
+    title: 'Easy ordering',
+    copy: 'Message or call us. We check stock and help you complete the order.',
+    accent: 'bg-brand-gradient',
+  },
 ] as const
 
 export function HomePage() {
@@ -78,20 +90,20 @@ export function HomePage() {
               variants={fadeUp}
               className="font-display text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
             >
-              Mobile gear,{' '}
-              <span className="text-brand-gradient">refined.</span>
+              Phones & accessories,{' '}
+              <span className="text-brand-gradient">made simple.</span>
             </motion.h1>
             <motion.p
               variants={fadeUp}
               className="max-w-lg text-base leading-relaxed text-white/78 sm:text-lg"
             >
-              Phones, earbuds, cases, and power — curated for everyday performance. Browse the
-              catalog, then contact us to order in {appConfig.currency}.
+              Find mobiles, earbuds, cases, and chargers. See prices in {appConfig.currency}, then
+              WhatsApp or call us to order.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap gap-3 pt-1">
               <Link to="/shop">
                 <Button size="lg" variant="gradient">
-                  Explore shop
+                  See products
                 </Button>
               </Link>
               <Link to="/contact">
@@ -100,7 +112,7 @@ export function HomePage() {
                   variant="secondary"
                   className="border-white/25 bg-white/10 text-white backdrop-blur-md hover:bg-white/20"
                 >
-                  Contact to order
+                  Call / WhatsApp
                 </Button>
               </Link>
             </motion.div>
@@ -124,16 +136,23 @@ export function HomePage() {
         </motion.div>
       </section>
 
-      <section className="relative z-10 -mt-8 px-4 sm:-mt-10 sm:px-6">
-        <div className="mx-auto grid max-w-6xl gap-3 sm:grid-cols-3">
-          {trustItems.map((item, index) => (
-            <Reveal key={item.title} delay={index * 0.06}>
-              <div className="glass-panel rounded-2xl p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-lift">
-                <p className="font-display text-base font-semibold text-ink">{item.title}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{item.copy}</p>
-              </div>
-            </Reveal>
-          ))}
+      <section className="relative border-b border-border/60 bg-surface-elevated/55 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid items-stretch gap-4 sm:grid-cols-3 sm:gap-5">
+            {trustItems.map((item, index) => (
+              <Reveal key={item.title} delay={index * 0.06} className="h-full">
+                <div className="flex h-full flex-col rounded-2xl border border-border/80 bg-surface-elevated p-5 shadow-soft transition hover:-translate-y-1 hover:border-brand-blue/30 hover:shadow-lift sm:p-6">
+                  <span className={`mb-4 inline-block h-1 w-10 rounded-full ${item.accent}`} />
+                  <p className="font-display text-base font-semibold tracking-tight text-ink sm:text-lg">
+                    {item.title}
+                  </p>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-secondary">
+                    {item.copy}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -149,7 +168,7 @@ export function HomePage() {
                   Shop by category
                 </h2>
                 <p className="mt-2 max-w-md text-ink-secondary">
-                  Eight accessory lines. One premium experience.
+                  Pick a type — phones, cases, earbuds, and more.
                 </p>
               </div>
               <Link
@@ -186,18 +205,18 @@ export function HomePage() {
             <div className="mb-10 flex items-end justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
-                  Featured
+                  Popular
                 </p>
                 <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                  Picks worth opening
+                  Top picks for you
                 </h2>
                 <p className="mt-2 text-ink-secondary">
-                  High-intent products with live pricing rules.
+                  Popular products people ask for the most.
                 </p>
               </div>
               <Link to="/shop">
                 <Button variant="secondary" size="sm">
-                  Browse shop
+                  See all
                 </Button>
               </Link>
             </div>
@@ -209,41 +228,14 @@ export function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {featured.map((product, index) => (
-                <Reveal key={product.id} delay={index * 0.05}>
+                <Reveal key={product.id} delay={index * 0.05} className="h-full">
                   <ProductCard product={product} />
                 </Reveal>
               ))}
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden py-20 sm:py-24">
-        <div className="absolute inset-0 bg-ink" />
-        <div className="absolute inset-0 bg-brand-gradient opacity-20" />
-        <div className="pointer-events-none absolute -left-10 top-10 h-56 w-56 rounded-full bg-brand-blue/40 blur-3xl" />
-        <div className="pointer-events-none absolute -right-10 bottom-0 h-56 w-56 rounded-full bg-brand-green/35 blur-3xl" />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <Reveal>
-            <div className="max-w-xl">
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Ready when you are
-              </h2>
-              <p className="mt-3 text-white/70">
-                No cart checkout. Tell us what you need — we confirm stock and arrange payment
-                offline.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <Link to="/contact">
-              <Button size="lg" variant="gradient">
-                Get in touch
-              </Button>
-            </Link>
-          </Reveal>
         </div>
       </section>
     </div>
