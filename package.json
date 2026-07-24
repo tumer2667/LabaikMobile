@@ -1,0 +1,11 @@
+{
+  "name": "labaikmobile",
+  "private": true,
+  "description": "LabaikMobiles monorepo — Vercel builds apps/web from the repo root.",
+  "scripts": {
+    "dev:web": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "build:web": "npm --prefix apps/web run build",
+    "lint:web": "npm --prefix apps/web run lint"
+  }
+}

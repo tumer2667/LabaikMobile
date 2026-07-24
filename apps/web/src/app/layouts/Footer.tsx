@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 import logo from '@/assets/logo.png'
+import { businessInfo } from '@/shared/config/business'
 import { appConfig } from '@/shared/config/env'
 
 const footerLinks = [
@@ -20,7 +21,7 @@ export function Footer() {
       <div className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-brand-green/20 blur-3xl" />
       <div className="h-1 w-full bg-brand-gradient" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6 md:flex-row md:items-start md:justify-between">
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.2fr_auto_1fr]">
         <div className="max-w-sm space-y-4">
           <div className="flex items-center gap-3">
             <img
@@ -31,12 +32,12 @@ export function Footer() {
             <p className="font-display text-xl font-semibold">{appConfig.name}</p>
           </div>
           <p className="text-sm leading-relaxed text-white/65">
-            Premium mobile phones and accessories. Prices in {appConfig.currency}. Reach out to
-            order — we handle fulfillment personally.
+            Premium mobile phones and accessories. Prices in {appConfig.currency}. Visit us in
+            Karim Park or contact us to order.
           </p>
         </div>
 
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3">
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3 md:justify-center">
           {footerLinks.map((link) => (
             <motion.div key={link.to} whileHover={{ y: -2 }}>
               <Link
@@ -48,6 +49,24 @@ export function Footer() {
             </motion.div>
           ))}
         </nav>
+
+        <div className="space-y-2 text-sm text-white/65 md:text-right">
+          <p className="font-semibold text-white/85">Visit</p>
+          <p>{businessInfo.addressLines[0]}</p>
+          <p>{businessInfo.addressLines[1]}</p>
+          <p>{businessInfo.addressLines[2]}</p>
+          <div className="flex flex-col gap-1 pt-2 md:items-end">
+            {businessInfo.phones.map((phone) => (
+              <a
+                key={phone.tel}
+                href={`tel:${phone.tel}`}
+                className="font-semibold text-brand-blue transition hover:text-white"
+              >
+                {phone.display}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="relative border-t border-white/10">
