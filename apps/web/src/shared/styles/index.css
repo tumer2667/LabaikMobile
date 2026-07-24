@@ -46,11 +46,19 @@
   }
 
   body {
-    @apply m-0 min-h-dvh bg-surface font-sans text-ink antialiased;
+    @apply m-0 min-h-dvh font-sans text-ink antialiased;
+    background-color: var(--color-surface);
     background-image:
-      radial-gradient(900px 480px at 8% -8%, rgb(24 166 229 / 0.14), transparent 55%),
-      radial-gradient(700px 420px at 96% 4%, rgb(89 188 70 / 0.12), transparent 50%),
-      radial-gradient(600px 400px at 50% 100%, rgb(24 166 229 / 0.05), transparent 45%);
+      linear-gradient(
+        155deg,
+        rgb(24 166 229 / 0.16) 0%,
+        rgb(244 248 251 / 0.92) 38%,
+        rgb(238 249 235 / 0.88) 68%,
+        rgb(89 188 70 / 0.12) 100%
+      ),
+      radial-gradient(1000px 560px at 0% -10%, rgb(24 166 229 / 0.22), transparent 58%),
+      radial-gradient(860px 520px at 100% 0%, rgb(89 188 70 / 0.18), transparent 52%),
+      radial-gradient(720px 480px at 50% 110%, rgb(24 166 229 / 0.1), transparent 48%);
     background-attachment: fixed;
   }
 

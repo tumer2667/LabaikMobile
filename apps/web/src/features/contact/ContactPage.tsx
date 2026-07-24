@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-import { businessInfo, whatsappUrl } from '@/shared/config/business'
+import { businessInfo, mapsOpenUrl, whatsappUrl } from '@/shared/config/business'
 import { appConfig } from '@/shared/config/env'
 import { Reveal } from '@/shared/ui/Reveal'
 import { Button } from '@/shared/ui/Button'
@@ -23,104 +23,174 @@ export function ContactPage() {
   const mailHref = `mailto:${businessInfo.email}?subject=${encodeURIComponent(
     interest ? `Order enquiry: ${interest}` : 'Order enquiry',
   )}`
-  const primaryWhatsApp = businessInfo.phones[0]
+  const primary = businessInfo.phones[0]
+  const secondary = businessInfo.phones[1]
   const whatsappHref = whatsappUrl(
-    primaryWhatsApp.whatsapp,
+    primary.whatsapp,
     interest ? `Hi, I'm interested in: ${interest}` : 'Hi, I would like to place an order.',
   )
 
+  const channels = [
+    {
+      label: 'WhatsApp',
+      detail: primary.display,
+      hint: 'Fastest for stock checks',
+      href: whatsappHref,
+      external: true,
+      tone: 'green' as const,
+    },
+    {
+      label: 'Call',
+      detail: primary.display,
+      hint: `Also ${secondary.display}`,
+      href: `tel:${primary.tel}`,
+      external: false,
+      tone: 'blue' as const,
+    },
+    {
+      label: 'Email',
+      detail: businessInfo.email,
+      hint: 'For detailed enquiries',
+      href: mailHref,
+      external: false,
+      tone: 'blue' as const,
+    },
+    {
+      label: 'Visit',
+      detail: 'Karim Park, Lahore',
+      hint: businessInfo.addressLines[0],
+      href: mapsOpenUrl(),
+      external: true,
+      tone: 'green' as const,
+    },
+  ]
+
   return (
-    <div className="relative overflow-hidden">
-      <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/15 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-brand-green/15 blur-3xl" />
-
-      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+    <div>
+      {/* Compact action hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-brand-blue/15 via-brand-green/8 to-transparent" />
+        <div className="relative mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6 sm:pt-20">
           <Reveal>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
-              Contact
-            </p>
-            <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              Ready to <span className="text-brand-gradient">order?</span>
-            </h1>
-            <p className="mt-4 max-w-md leading-relaxed text-ink-secondary">
-              There is no online checkout. Call, WhatsApp, or visit our shop, we confirm
-              availability and complete the order offline. All prices are in {appConfig.currency}.
-            </p>
-            {interest ? (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 rounded-2xl border border-brand-blue/30 bg-brand-blue-soft/80 px-4 py-3 text-sm text-ink backdrop-blur-sm"
-              >
-                Interested in: <span className="font-semibold">{interest}</span>
-              </motion.div>
-            ) : null}
-
-            <div className="mt-8 space-y-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Visit us
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+                  Contact
                 </p>
-                <p className="mt-1 text-base font-medium text-ink">{businessInfo.address}</p>
+                <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+                  Talk to us. <span className="text-brand-gradient">Order offline.</span>
+                </h1>
+                <p className="mt-4 text-ink-secondary">
+                  Pick a channel below — we confirm availability and complete your order in{' '}
+                  {appConfig.currency}. No online checkout.
+                </p>
               </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Phone / WhatsApp
-                </p>
-                <ul className="mt-2 space-y-2">
-                  {businessInfo.phones.map((phone) => (
-                    <li key={phone.tel}>
-                      <a
-                        href={`tel:${phone.tel}`}
-                        className="text-lg font-semibold text-brand-blue transition hover:text-brand-blue-hover"
-                      >
-                        {phone.display}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Email
-                </p>
-                <a
-                  href={mailHref}
-                  className="mt-1 inline-block text-lg font-semibold text-brand-blue transition hover:text-brand-blue-hover"
-                >
-                  {businessInfo.email}
+              <div className="flex flex-wrap gap-3">
+                <a href={whatsappHref} target="_blank" rel="noreferrer">
+                  <Button variant="gradient" size="lg">
+                    WhatsApp now
+                  </Button>
+                </a>
+                <a href={`tel:${primary.tel}`}>
+                  <Button variant="secondary" size="lg">
+                    Call {primary.display}
+                  </Button>
                 </a>
               </div>
             </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href={whatsappHref} target="_blank" rel="noreferrer">
-                <Button variant="gradient" size="lg">
-                  WhatsApp us
-                </Button>
-              </a>
-              <a href={`tel:${primaryWhatsApp.tel}`}>
-                <Button variant="secondary" size="lg">
-                  Call now
-                </Button>
-              </a>
-            </div>
           </Reveal>
 
-          <Reveal delay={0.08}>
-            <div className="glass-panel space-y-5 rounded-3xl p-5 shadow-lift sm:p-6">
-              <div>
-                <p className="font-display text-lg font-semibold text-ink">Find the shop</p>
-                <p className="mt-1 text-sm text-ink-muted">
-                  Shop # 5, Block # 1 — near Ali Computer College, Karim Park.
-                </p>
-              </div>
-              <StoreMap className="border-0 shadow-none" />
+          {interest ? (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 rounded-2xl border border-brand-green/35 bg-brand-green-soft/90 px-4 py-3 text-sm text-ink"
+            >
+              Interested in: <span className="font-semibold">{interest}</span>
+            </motion.div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* Channel cards — unique to contact */}
+      <section className="pb-12 sm:pb-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {channels.map((channel, index) => (
+              <Reveal key={channel.label} delay={index * 0.05}>
+                <a
+                  href={channel.href}
+                  target={channel.external ? '_blank' : undefined}
+                  rel={channel.external ? 'noreferrer' : undefined}
+                  className="group flex h-full flex-col rounded-3xl border border-border/80 bg-surface-elevated/90 p-6 shadow-soft backdrop-blur-sm transition hover:-translate-y-1 hover:border-brand-blue/35 hover:shadow-lift"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span
+                      className={
+                        channel.tone === 'green'
+                          ? 'rounded-full bg-brand-green-soft px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-green-hover'
+                          : 'rounded-full bg-brand-blue-soft px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-blue-deep'
+                      }
+                    >
+                      {channel.label}
+                    </span>
+                    <span className="text-sm font-semibold text-ink-muted transition group-hover:text-brand-blue">
+                      →
+                    </span>
+                  </div>
+                  <p className="mt-4 font-display text-xl font-semibold tracking-tight text-ink break-all">
+                    {channel.detail}
+                  </p>
+                  <p className="mt-2 text-sm text-ink-muted">{channel.hint}</p>
+                </a>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.12}>
+            <div className="mt-4 rounded-3xl border border-dashed border-border-strong bg-white/40 px-5 py-4 text-sm text-ink-secondary backdrop-blur-sm">
+              Prefer the second line? Call or WhatsApp{' '}
+              <a
+                href={`tel:${secondary.tel}`}
+                className="font-semibold text-brand-blue hover:text-brand-blue-hover"
+              >
+                {secondary.display}
+              </a>
+              .
             </div>
           </Reveal>
         </div>
-      </div>
+      </section>
+
+      {/* Map-forward block */}
+      <section className="pb-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <Reveal>
+            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
+                  Location
+                </p>
+                <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
+                  Come see us
+                </h2>
+                <p className="mt-1 max-w-lg text-sm text-ink-secondary">{businessInfo.address}</p>
+              </div>
+              <a
+                href={mapsOpenUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
+              >
+                Open in Google Maps →
+              </a>
+            </div>
+          </Reveal>
+          <Reveal delay={0.06}>
+            <StoreMap className="rounded-[1.75rem] shadow-lift [&_iframe]:h-72 sm:[&_iframe]:h-96" />
+          </Reveal>
+        </div>
+      </section>
     </div>
   )
 }
