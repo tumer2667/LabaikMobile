@@ -44,7 +44,7 @@ export function ContactPage() {
               Ready to <span className="text-brand-gradient">order?</span>
             </h1>
             <p className="mt-4 max-w-md leading-relaxed text-ink-secondary">
-              There is no online checkout. Call, WhatsApp, or visit our shop — we confirm
+              There is no online checkout. Call, WhatsApp, or visit our shop, we confirm
               availability and complete the order offline. All prices are in {appConfig.currency}.
             </p>
             {interest ? (
