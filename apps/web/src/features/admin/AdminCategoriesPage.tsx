@@ -7,6 +7,7 @@ import {
   deleteCategory,
   fetchAdminCategories,
   updateCategory,
+  uploadAdminImage,
 } from '@/features/catalog/api'
 import { Card } from '@/shared/ui/Card'
 import { ProductImage } from '@/shared/ui/ProductImage'
@@ -34,6 +35,7 @@ export function AdminCategoriesPage() {
   const [editing, setEditing] = useState<Category | null>(null)
   const [editForm, setEditForm] = useState<EditForm | null>(null)
   const [editError, setEditError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
@@ -163,12 +165,41 @@ export function AdminCategoriesPage() {
                 onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value })}
               />
             </Field>
-            <Field label="Image URL">
-              <input
-                className={inputClass}
-                value={editForm.image_url}
-                onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
-              />
+            <Field label="Category image">
+              <div className="mt-1.5 space-y-2">
+                <label className="inline-flex cursor-pointer">
+                  <span className="rounded-full bg-brand-blue px-3 py-1.5 text-xs font-semibold text-white">
+                    {uploading ? 'Uploading…' : 'Upload image'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      e.target.value = ''
+                      if (!file || !editForm) return
+                      setUploading(true)
+                      setEditError(null)
+                      try {
+                        const result = await uploadAdminImage(file, 'categories')
+                        setEditForm({ ...editForm, image_url: result.url })
+                      } catch (err) {
+                        setEditError(getApiErrorMessage(err, 'Image upload failed'))
+                      } finally {
+                        setUploading(false)
+                      }
+                    }}
+                  />
+                </label>
+                <input
+                  className={inputClass}
+                  value={editForm.image_url}
+                  onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
+                  placeholder="Or paste image URL"
+                />
+              </div>
             </Field>
             <Field label="Description">
               <input

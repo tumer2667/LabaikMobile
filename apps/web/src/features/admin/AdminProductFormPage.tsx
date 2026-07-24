@@ -8,11 +8,14 @@ import {
   fetchAdminCategories,
   fetchAdminProduct,
   updateProduct,
+  uploadAdminImage,
 } from '@/features/catalog/api'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
+import { ProductImage } from '@/shared/ui/ProductImage'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { getApiErrorMessage } from '@/shared/api/client'
+import { appConfig } from '@/shared/config/env'
 
 type FormState = {
   name: string
@@ -55,6 +58,7 @@ export function AdminProductFormPage() {
   const queryClient = useQueryClient()
   const [form, setForm] = useState<FormState>(emptyForm)
   const [error, setError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const productQuery = useQuery({
     queryKey: ['admin', 'product', id],
@@ -126,6 +130,52 @@ export function AdminProductFormPage() {
     },
     onError: (err) => setError(getApiErrorMessage(err)),
   })
+
+  const imageList = form.image_urls
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  const resolveImageSrc = (url: string) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) return url
+    const apiOrigin = appConfig.apiUrl.replace(/\/api\/v1\/?$/, '')
+    return `${apiOrigin}${url.startsWith('/') ? url : `/${url}`}`
+  }
+
+  const onUploadFiles = async (files: FileList | null) => {
+    if (!files?.length) return
+    setUploading(true)
+    setError(null)
+    try {
+      const uploaded: string[] = []
+      for (const file of Array.from(files)) {
+        const result = await uploadAdminImage(file, 'products')
+        uploaded.push(result.url)
+      }
+      setForm((f) => {
+        const existing = f.image_urls
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean)
+        return { ...f, image_urls: [...existing, ...uploaded].join('\n') }
+      })
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Image upload failed'))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const removeImageAt = (index: number) => {
+    setForm((f) => {
+      const next = f.image_urls
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      next.splice(index, 1)
+      return { ...f, image_urls: next.join('\n') }
+    })
+  }
 
   if (isEdit && productQuery.isLoading) {
     return (
@@ -233,15 +283,57 @@ export function AdminProductFormPage() {
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
           />
         </Field>
-        <Field label="Image URLs (one per line)">
-          <textarea
-            rows={3}
-            className={inputClass}
-            value={form.image_urls}
-            onChange={(e) => setForm((f) => ({ ...f, image_urls: e.target.value }))}
-            placeholder="https://…"
-          />
-        </Field>
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-ink">Product images</p>
+          <p className="text-xs text-ink-muted">
+            Upload photos from your computer (JPG/PNG/WEBP, max 5MB each). You can still paste a URL
+            below if needed.
+          </p>
+          <label className="inline-flex cursor-pointer">
+            <span className="rounded-full bg-brand-gradient px-4 py-2 text-sm font-semibold text-white shadow-glow-blue">
+              {uploading ? 'Uploading…' : 'Upload images'}
+            </span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                void onUploadFiles(e.target.files)
+                e.target.value = ''
+              }}
+            />
+          </label>
+          {imageList.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {imageList.map((url, index) => (
+                <div
+                  key={`${url}-${index}`}
+                  className="relative overflow-hidden rounded-xl border border-border bg-surface"
+                >
+                  <ProductImage src={resolveImageSrc(url)} alt="" className="aspect-square" />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-2 rounded-full bg-ink/80 px-2 py-0.5 text-xs font-semibold text-white"
+                    onClick={() => removeImageAt(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <Field label="Image URLs (optional — one per line)">
+            <textarea
+              rows={3}
+              className={inputClass}
+              value={form.image_urls}
+              onChange={(e) => setForm((f) => ({ ...f, image_urls: e.target.value }))}
+              placeholder="Uploaded images appear here automatically"
+            />
+          </Field>
+        </div>
         <Field label="Colors (comma-separated)">
           <input
             className={inputClass}
@@ -291,6 +383,7 @@ export function AdminProductFormPage() {
           <Button
             disabled={
               saveMutation.isPending ||
+              uploading ||
               !form.name ||
               !form.brand_id ||
               !form.category_id ||

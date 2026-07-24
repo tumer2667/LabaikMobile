@@ -112,3 +112,17 @@ export async function updateBrand(
 export async function deleteBrand(id: string): Promise<void> {
   await apiClient.delete(`/admin/brands/${id}`)
 }
+
+export async function uploadAdminImage(
+  file: File,
+  folder: 'products' | 'categories' = 'products',
+): Promise<{ url: string; path: string }> {
+  const body = new FormData()
+  body.append('file', file)
+  body.append('folder', folder)
+  const { data } = await apiClient.post<{ url: string; path: string }>('/admin/uploads', body, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60_000,
+  })
+  return data
+}
