@@ -1,9 +1,11 @@
 import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
+import { businessInfo, whatsappUrl } from '@/shared/config/business'
+import { appConfig } from '@/shared/config/env'
 import { Reveal } from '@/shared/ui/Reveal'
 import { Button } from '@/shared/ui/Button'
-import { appConfig } from '@/shared/config/env'
+import { StoreMap } from '@/shared/ui/StoreMap'
 
 type ContactState = {
   productName?: string
@@ -18,9 +20,14 @@ export function ContactPage() {
       ? `${state.productName}${state.color ? ` · ${state.color}` : ''}`
       : ''
 
-  const mailHref = `mailto:hello@labaikmobiles.com?subject=${encodeURIComponent(
+  const mailHref = `mailto:${businessInfo.email}?subject=${encodeURIComponent(
     interest ? `Order enquiry: ${interest}` : 'Order enquiry',
   )}`
+  const primaryWhatsApp = businessInfo.phones[0]
+  const whatsappHref = whatsappUrl(
+    primaryWhatsApp.whatsapp,
+    interest ? `Hi, I'm interested in: ${interest}` : 'Hi, I would like to place an order.',
+  )
 
   return (
     <div className="relative overflow-hidden">
@@ -34,11 +41,10 @@ export function ContactPage() {
               Contact
             </p>
             <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              Ready to{' '}
-              <span className="text-brand-gradient">order?</span>
+              Ready to <span className="text-brand-gradient">order?</span>
             </h1>
             <p className="mt-4 max-w-md leading-relaxed text-ink-secondary">
-              There is no online checkout. Message us with the products you want — we confirm
+              There is no online checkout. Call, WhatsApp, or visit our shop, we confirm
               availability and complete the order offline. All prices are in {appConfig.currency}.
             </p>
             {interest ? (
@@ -50,10 +56,31 @@ export function ContactPage() {
                 Interested in: <span className="font-semibold">{interest}</span>
               </motion.div>
             ) : null}
-          </Reveal>
 
-          <Reveal delay={0.08}>
-            <div className="glass-panel space-y-6 rounded-3xl p-6 shadow-lift sm:p-8">
+            <div className="mt-8 space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                  Visit us
+                </p>
+                <p className="mt-1 text-base font-medium text-ink">{businessInfo.address}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                  Phone / WhatsApp
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {businessInfo.phones.map((phone) => (
+                    <li key={phone.tel}>
+                      <a
+                        href={`tel:${phone.tel}`}
+                        className="text-lg font-semibold text-brand-blue transition hover:text-brand-blue-hover"
+                      >
+                        {phone.display}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Email
@@ -62,25 +89,34 @@ export function ContactPage() {
                   href={mailHref}
                   className="mt-1 inline-block text-lg font-semibold text-brand-blue transition hover:text-brand-blue-hover"
                 >
-                  hello@labaikmobiles.com
+                  {businessInfo.email}
                 </a>
               </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href={whatsappHref} target="_blank" rel="noreferrer">
+                <Button variant="gradient" size="lg">
+                  WhatsApp us
+                </Button>
+              </a>
+              <a href={`tel:${primaryWhatsApp.tel}`}>
+                <Button variant="secondary" size="lg">
+                  Call now
+                </Button>
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <div className="glass-panel space-y-5 rounded-3xl p-5 shadow-lift sm:p-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  WhatsApp
+                <p className="font-display text-lg font-semibold text-ink">Find the shop</p>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Shop # 5, Block # 1 — near Ali Computer College, Karim Park.
                 </p>
-                <p className="mt-1 text-lg font-medium text-ink">Add your business number</p>
               </div>
-              <div className="border-t border-border pt-5">
-                <p className="text-sm text-ink-muted">
-                  Email is the fastest path while we build a contact form.
-                </p>
-                <a href={mailHref} className="mt-5 inline-block">
-                  <Button variant="gradient" size="lg">
-                    Open email
-                  </Button>
-                </a>
-              </div>
+              <StoreMap className="border-0 shadow-none" />
             </div>
           </Reveal>
         </div>

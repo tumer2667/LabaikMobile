@@ -12,6 +12,13 @@ export function FaqPage() {
         </h1>
         <div className="mt-8 space-y-6 text-ink-secondary">
           <div>
+            <h2 className="font-display text-lg font-semibold text-ink">Where are you located?</h2>
+            <p className="mt-2">
+              Shop # 5, Block # 1, Near Ali Computer College, Karim Park, Lahore. Call 0307 8600067
+              or 0300 0065558, or message us on WhatsApp.
+            </p>
+          </div>
+          <div>
             <h2 className="font-display text-lg font-semibold text-ink">How do I buy?</h2>
             <p className="mt-2">
               Browse products, then use Contact. We confirm stock and arrange payment offline.
