@@ -1,0 +1,48 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+
+import { cn } from '@/shared/lib/cn'
+import { Skeleton } from '@/shared/ui/Skeleton'
+
+type ProductImageProps = {
+  src: string
+  alt: string
+  className?: string
+  imgClassName?: string
+  priority?: boolean
+}
+
+export function ProductImage({
+  src,
+  alt,
+  className,
+  imgClassName,
+  priority = false,
+}: ProductImageProps) {
+  const [loaded, setLoaded] = useState(false)
+  const [failed, setFailed] = useState(false)
+
+  return (
+    <div className={cn('relative overflow-hidden bg-brand-blue-soft/40', className)}>
+      {!loaded && !failed && <Skeleton className="absolute inset-0 rounded-none" />}
+      {failed ? (
+        <div className="flex h-full min-h-40 items-center justify-center bg-gradient-to-br from-brand-blue-soft to-brand-green-soft text-sm text-ink-muted">
+          Image unavailable
+        </div>
+      ) : (
+        <motion.img
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 1.04 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className={cn('h-full w-full object-cover', imgClassName)}
+        />
+      )}
+    </div>
+  )
+}
