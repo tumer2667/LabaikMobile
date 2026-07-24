@@ -10,7 +10,7 @@ import { getApiErrorMessage } from '@/shared/api/client'
 import { appConfig } from '@/shared/config/env'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
-import logo from '@/assets/logo.jpeg'
+import logo from '@/assets/logo.png'
 
 export function AdminLoginPage() {
   const { isAuthenticated, user, isBootstrapping, acceptSession, logout } = useAuth()
@@ -46,7 +46,11 @@ export function AdminLoginPage() {
     <div className="flex min-h-dvh items-center justify-center bg-[#0b1220] px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center text-white">
-          <img src={logo} alt="" className="h-14 w-14 rounded-xl object-cover ring-1 ring-white/10" />
+          <img
+            src={logo}
+            alt=""
+            className="h-14 w-14 rounded-xl bg-white object-contain p-0.5 ring-1 ring-white/10"
+          />
           <h1 className="mt-4 font-display text-2xl font-semibold">{appConfig.name}</h1>
           <p className="mt-1 text-sm text-white/55">Admin portal</p>
         </div>

@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-import logo from '@/assets/logo.jpeg'
+import logo from '@/assets/logo.png'
 import { appConfig } from '@/shared/config/env'
 import { useAuth } from '@/features/auth/AuthContext'
 import { Button } from '@/shared/ui/Button'
@@ -29,7 +29,7 @@ export function AdminLayout() {
     <div className="flex min-h-dvh bg-[#0b1220] text-white">
       <aside className="hidden w-64 shrink-0 border-r border-white/10 bg-[#0e1628] md:flex md:flex-col">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-          <img src={logo} alt="" className="h-9 w-9 rounded-lg object-cover" />
+          <img src={logo} alt="" className="h-9 w-9 rounded-lg bg-white object-contain p-0.5" />
           <div>
             <p className="font-display text-sm font-semibold">{appConfig.name}</p>
             <p className="text-xs text-white/50">Admin</p>

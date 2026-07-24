@@ -81,14 +81,14 @@ export function ProductDetailPage() {
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
         <Reveal>
           <div className="space-y-3">
-            <div className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft">
+            <div className="overflow-hidden rounded-3xl border border-border/80 bg-surface-elevated shadow-lift">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={image}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <ProductImage src={image} alt={product.name} priority className="aspect-square" />
                 </motion.div>
@@ -187,7 +187,7 @@ export function ProductDetailPage() {
 
             <div className="flex flex-wrap gap-3 border-t border-border pt-6">
               <Link to="/contact" state={{ productName: product.name, color: selectedColor }}>
-                <Button size="lg" disabled={!product.in_stock}>
+                <Button size="lg" variant="gradient" disabled={!product.in_stock}>
                   {product.show_price ? 'Contact to order' : 'Request a quote'}
                 </Button>
               </Link>
