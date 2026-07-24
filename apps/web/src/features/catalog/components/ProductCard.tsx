@@ -23,17 +23,17 @@ export function ProductCard({ product, className }: ProductCardProps) {
       layout
       whileHover={{ y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={cn('group', className)}
+      className={cn('group flex h-full', className)}
     >
       <Link
         to={`/shop/${product.slug}`}
-        className="relative block overflow-hidden rounded-2xl border border-border/80 bg-surface-elevated shadow-soft transition-[box-shadow,border-color] duration-300 hover:border-brand-blue/35 hover:shadow-lift"
+        className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-surface-elevated shadow-soft transition-[box-shadow,border-color] duration-300 hover:border-brand-blue/35 hover:shadow-lift"
       >
         <div className="pointer-events-none absolute inset-0 z-10 opacity-0 transition duration-500 group-hover:opacity-100">
           <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/10 via-transparent to-brand-green/5" />
         </div>
 
-        <div className="relative aspect-[4/5] overflow-hidden bg-brand-blue-soft/40">
+        <div className="relative aspect-[4/5] shrink-0 overflow-hidden bg-brand-blue-soft/40">
           <ProductImage
             src={image}
             alt={product.name}
@@ -54,23 +54,25 @@ export function ProductCard({ product, className }: ProductCardProps) {
             )}
             {!product.in_stock && (
               <span className="rounded-full bg-ink-secondary/90 px-2.5 py-1 text-[11px] font-semibold text-white">
-                Sold out
+                Out of stock
               </span>
             )}
           </div>
         </div>
 
-        <div className="relative space-y-2 p-4 sm:p-5">
+        <div className="relative flex flex-1 flex-col p-4 sm:p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
             {product.brand}
           </p>
-          <h3 className="font-display text-base font-semibold tracking-tight text-ink transition group-hover:text-brand-blue-deep line-clamp-1 sm:text-lg">
+          <h3 className="mt-2 font-display text-base font-semibold tracking-tight text-ink transition group-hover:text-brand-blue-deep line-clamp-1 sm:text-lg">
             {product.name}
           </h3>
-          <p className="line-clamp-2 text-sm text-ink-muted">{product.short_description}</p>
-          <div className="flex items-end justify-between gap-3 pt-2">
+          <p className="mt-2 min-h-[2.5rem] line-clamp-2 text-sm leading-5 text-ink-muted">
+            {product.short_description}
+          </p>
+          <div className="mt-auto flex items-end justify-between gap-3 pt-4">
             <ProductPrice product={product} size="md" />
-            <p className="shrink-0 text-xs font-medium text-ink-muted">
+            <p className="shrink-0 pb-0.5 text-xs font-medium text-ink-muted">
               ★ {product.rating.toFixed(1)}
             </p>
           </div>

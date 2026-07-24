@@ -133,7 +133,7 @@ export function ProductDetailPage() {
               <ProductPrice product={product} size="lg" />
               {!product.show_price && (
                 <p className="text-sm text-ink-muted">
-                  Pricing for this category is hidden — contact us for a quote.
+                  Price is not shown here — message us and we will tell you.
                 </p>
               )}
             </div>
@@ -146,7 +146,7 @@ export function ProductDetailPage() {
                   : 'bg-border text-ink-muted',
               )}
             >
-              {product.in_stock ? 'In stock' : 'Currently unavailable'}
+              {product.in_stock ? 'In stock' : 'Not available now'}
             </p>
 
             {product.colors.length > 0 && (
@@ -188,12 +188,12 @@ export function ProductDetailPage() {
             <div className="flex flex-wrap gap-3 border-t border-border pt-6">
               <Link to="/contact" state={{ productName: product.name, color: selectedColor }}>
                 <Button size="lg" variant="gradient" disabled={!product.in_stock}>
-                  {product.show_price ? 'Contact to order' : 'Request a quote'}
+                  {product.show_price ? 'Order this item' : 'Ask for price'}
                 </Button>
               </Link>
               <Link to="/shop">
                 <Button size="lg" variant="secondary">
-                  Continue shopping
+                  Back to shop
                 </Button>
               </Link>
             </div>
@@ -203,8 +203,8 @@ export function ProductDetailPage() {
 
       {related.length > 0 && (
         <section className="mt-20">
-          <h2 className="font-display text-2xl font-semibold text-ink">You may also like</h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <h2 className="font-display text-2xl font-semibold text-ink">More products</h2>
+          <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}

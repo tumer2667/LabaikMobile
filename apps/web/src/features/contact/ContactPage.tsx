@@ -27,14 +27,14 @@ export function ContactPage() {
   const secondary = businessInfo.phones[1]
   const whatsappHref = whatsappUrl(
     primary.whatsapp,
-    interest ? `Hi, I'm interested in: ${interest}` : 'Hi, I would like to place an order.',
+    interest ? `Hi, I want to ask about: ${interest}` : 'Hi, I want to place an order.',
   )
 
   const channels = [
     {
       label: 'WhatsApp',
       detail: primary.display,
-      hint: 'Fastest for stock checks',
+      hint: 'Fastest way to ask about stock',
       href: whatsappHref,
       external: true,
       tone: 'green' as const,
@@ -50,13 +50,13 @@ export function ContactPage() {
     {
       label: 'Email',
       detail: businessInfo.email,
-      hint: 'For detailed enquiries',
+      hint: 'For longer messages',
       href: mailHref,
       external: false,
       tone: 'blue' as const,
     },
     {
-      label: 'Visit',
+      label: 'Visit shop',
       detail: 'Karim Park, Lahore',
       hint: businessInfo.addressLines[0],
       href: mapsOpenUrl(),
@@ -78,11 +78,11 @@ export function ContactPage() {
                   Contact
                 </p>
                 <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-                  Talk to us. <span className="text-brand-gradient">Order offline.</span>
+                  Need something? <span className="text-brand-gradient">Message us.</span>
                 </h1>
                 <p className="mt-4 text-ink-secondary">
-                  Pick a channel below — we confirm availability and complete your order in{' '}
-                  {appConfig.currency}. No online checkout.
+                  Choose WhatsApp, call, email, or visit the shop. We check stock and help you order
+                  in {appConfig.currency}. No online payment here.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -106,7 +106,7 @@ export function ContactPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mt-8 rounded-2xl border border-brand-green/35 bg-brand-green-soft/90 px-4 py-3 text-sm text-ink"
             >
-              Interested in: <span className="font-semibold">{interest}</span>
+              Looking at: <span className="font-semibold">{interest}</span>
             </motion.div>
           ) : null}
         </div>
@@ -149,7 +149,7 @@ export function ContactPage() {
 
           <Reveal delay={0.12}>
             <div className="mt-4 rounded-3xl border border-dashed border-border-strong bg-white/40 px-5 py-4 text-sm text-ink-secondary backdrop-blur-sm">
-              Prefer the second line? Call or WhatsApp{' '}
+              Prefer another number? Call or WhatsApp{' '}
               <a
                 href={`tel:${secondary.tel}`}
                 className="font-semibold text-brand-blue hover:text-brand-blue-hover"
@@ -172,7 +172,7 @@ export function ContactPage() {
                   Location
                 </p>
                 <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
-                  Come see us
+                  Our shop location
                 </h2>
                 <p className="mt-1 max-w-lg text-sm text-ink-secondary">{businessInfo.address}</p>
               </div>

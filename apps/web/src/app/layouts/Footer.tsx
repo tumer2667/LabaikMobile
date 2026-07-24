@@ -32,8 +32,8 @@ export function Footer() {
             <p className="font-display text-xl font-semibold">{appConfig.name}</p>
           </div>
           <p className="text-sm leading-relaxed text-white/65">
-            Premium mobile phones and accessories. Prices in {appConfig.currency}. Visit us in
-            Karim Park or contact us to order.
+            Phones and accessories in {appConfig.currency}. Visit us in Karim Park, or call /
+            WhatsApp to order.
           </p>
         </div>
 
