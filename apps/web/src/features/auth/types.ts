@@ -1,5 +1,11 @@
-export type UserRole = 'customer' | 'admin' | 'sub_admin'
+export type UserRole = 'customer' | 'super_admin' | 'admin'
 export type UserStatus = 'active' | 'disabled'
+
+export const STAFF_ROLES = new Set<UserRole>(['super_admin', 'admin'])
+
+export function isStaffRole(role: string | undefined | null): boolean {
+  return role != null && STAFF_ROLES.has(role as UserRole)
+}
 
 export type AuthUser = {
   id: string

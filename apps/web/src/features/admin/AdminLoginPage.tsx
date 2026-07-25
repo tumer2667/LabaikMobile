@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 
 import { useAuth } from '@/features/auth/AuthContext'
+import { isStaffRole } from '@/features/auth/types'
 import { loginSchema, type LoginFormValues } from '@/features/auth/schemas'
 import { adminLogin } from '@/features/admin/api'
 import { getApiErrorMessage } from '@/shared/api/client'
@@ -26,7 +27,7 @@ export function AdminLoginPage() {
     defaultValues: { email: 'admin@labaikmobiles.com', password: '' },
   })
 
-  if (!isBootstrapping && isAuthenticated && (user?.role === 'admin' || user?.role === 'sub_admin')) {
+  if (!isBootstrapping && isAuthenticated && isStaffRole(user?.role)) {
     return <Navigate to="/admin" replace />
   }
 

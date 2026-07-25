@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 
 import { fetchAdminDashboard } from '@/features/admin/api'
 import { fetchAdminCategories, fetchAdminProducts } from '@/features/catalog/api'
+import { useAuth } from '@/features/auth/AuthContext'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { formatPkr } from '@/shared/lib/money'
 
 export function AdminDashboardPage() {
+  const { user } = useAuth()
   const dashQuery = useQuery({
     queryKey: ['admin', 'dashboard'],
     queryFn: fetchAdminDashboard,
@@ -29,6 +31,8 @@ export function AdminDashboardPage() {
     customers: 0,
   }
 
+  const roleLabel = user?.role === 'super_admin' ? 'Super admin' : 'Admin'
+
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -36,9 +40,11 @@ export function AdminDashboardPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
             Dashboard
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Overview</h1>
+          <h1 className="mt-1 font-display text-3xl font-semibold text-ink">
+            Welcome, {user?.full_name || 'Admin'}
+          </h1>
           <p className="mt-1 text-sm text-ink-secondary">
-            Live catalog metrics from the API.
+            {roleLabel} · Live catalog metrics from the API.
           </p>
         </div>
         <Link to="/admin/products">

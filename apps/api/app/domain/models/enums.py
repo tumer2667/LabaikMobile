@@ -3,8 +3,11 @@ from enum import StrEnum
 
 class UserRole(StrEnum):
     CUSTOMER = "customer"
-    ADMIN = "admin"
-    SUB_ADMIN = "sub_admin"
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"  # sub-admin: same access as super_admin except user management
+
+
+STAFF_ROLES = frozenset({UserRole.SUPER_ADMIN.value, UserRole.ADMIN.value})
 
 
 class UserStatus(StrEnum):

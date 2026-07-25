@@ -15,6 +15,7 @@ import { AdminProductFormPage } from '@/features/admin/AdminProductFormPage'
 import { AdminCategoriesPage } from '@/features/admin/AdminCategoriesPage'
 import { AdminBrandsPage } from '@/features/admin/AdminBrandsPage'
 import { AdminOrdersPage, AdminSettingsPage } from '@/features/admin/AdminPlaceholderPages'
+import { AdminUsersPage } from '@/features/admin/AdminUsersPage'
 import { RequireAdmin } from '@/features/admin/RequireAdmin'
 
 export const router = createBrowserRouter([
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
       { path: 'products/:id/edit', element: <AdminProductFormPage /> },
       { path: 'categories', element: <AdminCategoriesPage /> },
       { path: 'brands', element: <AdminBrandsPage /> },
+      { path: 'users', element: <AdminUsersPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
     ],

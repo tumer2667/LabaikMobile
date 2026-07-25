@@ -24,3 +24,21 @@ export async function fetchAdminSession(): Promise<AuthUser> {
   const { data } = await apiClient.get<AuthUser>('/admin/session')
   return data
 }
+
+export async function fetchAdminUsers(): Promise<AuthUser[]> {
+  const { data } = await apiClient.get<AuthUser[]>('/admin/users')
+  return data
+}
+
+export async function createAdminUser(payload: {
+  full_name: string
+  email: string
+  password: string
+}): Promise<AuthUser> {
+  const { data } = await apiClient.post<AuthUser>('/admin/users', payload)
+  return data
+}
+
+export async function deleteAdminUser(id: string): Promise<void> {
+  await apiClient.delete(`/admin/users/${id}`)
+}

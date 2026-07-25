@@ -17,7 +17,7 @@ from app.core.security import (
     refresh_expiry,
     verify_password,
 )
-from app.domain.models.enums import UserRole, UserStatus
+from app.domain.models.enums import STAFF_ROLES, UserRole, UserStatus
 from app.infrastructure.db.models import RefreshToken, User
 from app.schemas.auth import (
     AuthResponse,
@@ -106,9 +106,9 @@ def login_user(
 def login_admin(
     db: Session, payload: LoginRequest, *, user_agent: str | None = None
 ) -> AuthResponse:
-    """Admin portal login — only admin / sub_admin roles."""
+    """Admin portal login — only super_admin / admin roles."""
     result = login_user(db, payload, user_agent=user_agent)
-    if result.user.role not in {UserRole.ADMIN.value, UserRole.SUB_ADMIN.value}:
+    if result.user.role not in STAFF_ROLES:
         # Revoke the refresh we just issued
         logout_user(db, result.tokens.refresh_token)
         raise AppError(

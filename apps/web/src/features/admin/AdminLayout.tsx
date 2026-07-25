@@ -7,7 +7,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { Button } from '@/shared/ui/Button'
 import { cn } from '@/shared/lib/cn'
 
-const nav = [
+const baseNav = [
   { to: '/admin', label: 'Dashboard', end: true },
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/categories', label: 'Categories' },
@@ -16,9 +16,24 @@ const nav = [
   { to: '/admin/settings', label: 'Settings' },
 ] as const
 
+function roleLabel(role: string | undefined) {
+  if (role === 'super_admin') return 'Super admin'
+  if (role === 'admin') return 'Admin'
+  return 'Admin'
+}
+
 export function AdminLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const isSuperAdmin = user?.role === 'super_admin'
+
+  const nav = isSuperAdmin
+    ? [
+        ...baseNav.slice(0, 5),
+        { to: '/admin/users', label: 'Users' },
+        ...baseNav.slice(5),
+      ]
+    : [...baseNav]
 
   const onLogout = async () => {
     await logout()
@@ -32,7 +47,7 @@ export function AdminLayout() {
           <img src={logo} alt="" className="h-9 w-9 rounded-lg bg-white object-contain p-0.5" />
           <div>
             <p className="font-display text-sm font-semibold">{appConfig.name}</p>
-            <p className="text-xs text-white/50">Admin</p>
+            <p className="text-xs text-white/50">{roleLabel(user?.role)}</p>
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Admin">
@@ -40,7 +55,7 @@ export function AdminLayout() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={'end' in item ? item.end : false}
+              end={'end' in item ? Boolean(item.end) : false}
               className={({ isActive }) =>
                 cn(
                   'rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition',
@@ -54,8 +69,9 @@ export function AdminLayout() {
           ))}
         </nav>
         <div className="border-t border-white/10 p-4">
-          <p className="truncate text-sm font-medium">{user?.full_name}</p>
+          <p className="truncate text-sm font-medium">{user?.full_name || 'Admin'}</p>
           <p className="truncate text-xs text-white/50">{user?.email}</p>
+          <p className="mt-1 text-[11px] text-white/40">{roleLabel(user?.role)}</p>
           <div className="mt-3 flex gap-2">
             <Link to="/" className="flex-1">
               <Button size="sm" variant="secondary" className="w-full text-ink">
@@ -72,9 +88,13 @@ export function AdminLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-8">
           <div className="md:hidden">
-            <p className="font-display font-semibold">{appConfig.name} Admin</p>
+            <p className="font-display font-semibold">{appConfig.name}</p>
+            <p className="truncate text-xs text-white/50">{user?.full_name}</p>
           </div>
-          <p className="hidden text-sm text-white/50 md:block">Management console</p>
+          <div className="hidden md:block">
+            <p className="text-sm text-white/50">Signed in as</p>
+            <p className="text-sm font-medium text-white">{user?.full_name || user?.email}</p>
+          </div>
           <div className="flex items-center gap-2 md:hidden">
             <Button size="sm" variant="ghost" className="text-white/80" onClick={() => void onLogout()}>
               Sign out

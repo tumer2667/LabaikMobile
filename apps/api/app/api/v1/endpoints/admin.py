@@ -2,9 +2,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query
 
-from app.api.v1.deps import AdminUser, DbSession
+from app.api.v1.deps import AdminUser, DbSession, SuperAdminUser
 from app.application.catalog import service as catalog
-from app.schemas.auth import UserResponse
+from app.application.identity import admin_users
+from app.schemas.auth import AdminUserCreate, UserResponse
 from app.schemas.catalog import (
     BrandCreate,
     BrandResponse,
@@ -36,6 +37,23 @@ def dashboard(_admin: AdminUser, db: DbSession) -> dict:
 @router.get("/session", response_model=UserResponse)
 def session(admin: AdminUser) -> UserResponse:
     return UserResponse.model_validate(admin)
+
+
+@router.get("/users", response_model=list[UserResponse])
+def list_users(_super: SuperAdminUser, db: DbSession) -> list[UserResponse]:
+    return admin_users.list_staff_users(db)
+
+
+@router.post("/users", response_model=UserResponse, status_code=201)
+def create_user(
+    payload: AdminUserCreate, _super: SuperAdminUser, db: DbSession
+) -> UserResponse:
+    return admin_users.create_admin_user(db, payload)
+
+
+@router.delete("/users/{user_id}", status_code=204)
+def delete_user(user_id: UUID, super_admin: SuperAdminUser, db: DbSession) -> None:
+    admin_users.delete_admin_user(db, user_id, actor=super_admin)
 
 
 @router.get("/categories", response_model=list[CategoryResponse])

@@ -2,14 +2,13 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useEffect, type ReactNode } from 'react'
 
 import { useAuth } from '@/features/auth/AuthContext'
+import { isStaffRole } from '@/features/auth/types'
 import { Skeleton } from '@/shared/ui/Skeleton'
-
-const ADMIN_ROLES = new Set(['admin', 'sub_admin'])
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { user, isAuthenticated, isBootstrapping, logout } = useAuth()
   const location = useLocation()
-  const isAdmin = user != null && ADMIN_ROLES.has(user.role)
+  const isAdmin = isStaffRole(user?.role)
 
   useEffect(() => {
     if (!isBootstrapping && isAuthenticated && user && !isAdmin) {

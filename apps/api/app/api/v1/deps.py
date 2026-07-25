@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.application.identity import auth_service
 from app.core.exceptions import AppError
 from app.core.security import decode_access_token
-from app.domain.models.enums import UserRole, UserStatus
+from app.domain.models.enums import STAFF_ROLES, UserRole, UserStatus
 from app.infrastructure.db.models import User
 from app.infrastructure.db.session import get_db
 
@@ -54,7 +54,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 def require_admin(user: CurrentUser) -> User:
-    if user.role not in {UserRole.ADMIN.value, UserRole.SUB_ADMIN.value}:
+    if user.role not in STAFF_ROLES:
         raise AppError(
             "Admin access required",
             code="admin_required",
@@ -63,4 +63,15 @@ def require_admin(user: CurrentUser) -> User:
     return user
 
 
+def require_super_admin(user: CurrentUser) -> User:
+    if user.role != UserRole.SUPER_ADMIN.value:
+        raise AppError(
+            "Super admin access required",
+            code="super_admin_required",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+    return user
+
+
 AdminUser = Annotated[User, Depends(require_admin)]
+SuperAdminUser = Annotated[User, Depends(require_super_admin)]
