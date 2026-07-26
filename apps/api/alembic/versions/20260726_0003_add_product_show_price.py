@@ -30,7 +30,8 @@ def upgrade() -> None:
                     "show_price",
                     sa.Boolean(),
                     nullable=False,
-                    server_default=sa.text("1"),
+                    # Use boolean true — Postgres rejects DEFAULT 1 for boolean columns.
+                    server_default=sa.true(),
                 )
             )
 
