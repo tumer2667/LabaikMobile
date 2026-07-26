@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 
 from app.api.v1.deps import AdminUser, DbSession, SuperAdminUser
 from app.application.catalog import service as catalog
+from app.application.dashboard import service as dashboard
 from app.application.identity import admin_users
 from app.schemas.auth import AdminUserCreate, UserResponse
 from app.schemas.catalog import (
@@ -23,15 +24,8 @@ router = APIRouter(prefix="/admin")
 
 
 @router.get("/dashboard")
-def dashboard(_admin: AdminUser, db: DbSession) -> dict:
-    stats = catalog.dashboard_stats(db)
-    return {
-        "stats": stats,
-        "notes": [
-            "Catalog is API-backed. Toggle category show_price to control storefront pricing.",
-            "Upload product images from Admin → Products (stored in Supabase Storage).",
-        ],
-    }
+def admin_dashboard(_admin: AdminUser, db: DbSession) -> dict:
+    return dashboard.build_dashboard(db)
 
 
 @router.get("/session", response_model=UserResponse)

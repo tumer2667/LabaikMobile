@@ -2,12 +2,37 @@ import { apiClient } from '@/shared/api/client'
 import type { AuthResponse, AuthUser, LoginPayload } from '@/features/auth/types'
 import type { FinanceReport, FinanceReportParams } from '@/features/admin/financeTypes'
 
-export async function adminLogin(payload: LoginPayload): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/admin/login', payload)
-  return data
+export type DashboardActivity = {
+  type: string
+  title: string
+  detail: string
+  at: string | null
+  href?: string | null
 }
 
-export async function fetchAdminDashboard(): Promise<{
+export type DashboardLogin = {
+  user_id: string
+  full_name: string
+  email: string
+  role: string
+  role_label: string
+  logged_in_at: string | null
+}
+
+export type DashboardInvoice = {
+  id: string
+  number: string
+  status: string
+  customer_name: string
+  total_pkr: number
+  refunded_pkr: number
+  issued_at: string | null
+  created_at: string | null
+  created_by_name: string | null
+  line_count: number
+}
+
+export type AdminDashboardData = {
   stats: {
     products: number
     categories: number
@@ -18,9 +43,20 @@ export async function fetchAdminDashboard(): Promise<{
     orders: number
     customers: number
   }
+  recent_invoices: DashboardInvoice[]
+  last_logins: DashboardLogin[]
+  last_login: DashboardLogin | null
+  recent_activity: DashboardActivity[]
   notes: string[]
-}> {
-  const { data } = await apiClient.get('/admin/dashboard')
+}
+
+export async function adminLogin(payload: LoginPayload): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>('/auth/admin/login', payload)
+  return data
+}
+
+export async function fetchAdminDashboard(): Promise<AdminDashboardData> {
+  const { data } = await apiClient.get<AdminDashboardData>('/admin/dashboard')
   return data
 }
 

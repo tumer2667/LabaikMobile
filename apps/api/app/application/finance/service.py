@@ -52,17 +52,14 @@ def _parse_date(value: str | None, *, field: str) -> date | None:
 
 
 def _default_range(period: str, today: date) -> tuple[date, date]:
-    """Simple ranges: today, this week, previous calendar month, this year."""
+    """Simple ranges: today, this week, this month, this year."""
     if period == "day":
         return today, today
     if period == "week":
         start_of_week = today - timedelta(days=today.weekday())
         return start_of_week, today
     if period == "month":
-        first_this_month = today.replace(day=1)
-        last_month_end = first_this_month - timedelta(days=1)
-        last_month_start = last_month_end.replace(day=1)
-        return last_month_start, last_month_end
+        return today.replace(day=1), today
     return date(today.year, 1, 1), today
 
 

@@ -22,7 +22,7 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 const PERIODS: { value: FinancePeriod; label: string; shortName: string }[] = [
   { value: 'day', label: 'Day', shortName: 'Today' },
   { value: 'week', label: 'Week', shortName: 'This week' },
-  { value: 'month', label: 'Month', shortName: 'Last month' },
+  { value: 'month', label: 'Month', shortName: 'This month' },
   { value: 'year', label: 'Year', shortName: 'This year' },
 ]
 
@@ -170,7 +170,7 @@ export function AdminFinancePage() {
                 setToDate('')
               }}
             >
-              Show {periodMeta?.shortName.toLowerCase() ?? 'last month'}
+              Show {periodMeta?.shortName.toLowerCase() ?? 'this month'}
             </Button>
           </div>
         </div>
