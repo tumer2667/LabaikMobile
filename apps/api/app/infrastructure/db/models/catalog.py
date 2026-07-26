@@ -76,6 +76,7 @@ class Product(Base):
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     price_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
     compare_at_pkr: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    show_price: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default=ProductStatus.ACTIVE.value, nullable=False)
     in_stock: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

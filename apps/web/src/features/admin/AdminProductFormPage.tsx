@@ -30,6 +30,7 @@ type FormState = {
   in_stock: boolean
   is_featured: boolean
   is_new: boolean
+  show_price: boolean
   status: string
 }
 
@@ -47,6 +48,7 @@ const emptyForm: FormState = {
   in_stock: true,
   is_featured: false,
   is_new: false,
+  show_price: true,
   status: 'active',
 }
 
@@ -87,6 +89,7 @@ export function AdminProductFormPage() {
       in_stock: p.in_stock,
       is_featured: p.is_featured,
       is_new: p.is_new,
+      show_price: p.show_price,
       status: p.status,
     })
   }, [productQuery.data])
@@ -116,6 +119,7 @@ export function AdminProductFormPage() {
         in_stock: form.in_stock,
         is_featured: form.is_featured,
         is_new: form.is_new,
+        show_price: form.show_price,
         status: form.status,
       }
       if (isEdit && id) return updateProduct(id, payload)
@@ -367,6 +371,14 @@ export function AdminProductFormPage() {
               onChange={(e) => setForm((f) => ({ ...f, is_new: e.target.checked }))}
             />
             New
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={form.show_price}
+              onChange={(e) => setForm((f) => ({ ...f, show_price: e.target.checked }))}
+            />
+            Show price on website
           </label>
         </div>
 

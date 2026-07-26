@@ -426,6 +426,7 @@ def ensure_catalog_seed(db: Session) -> None:
             description=item["description"],
             price_pkr=item["price_pkr"],
             compare_at_pkr=item.get("compare_at_pkr"),
+            show_price=categories[item["category"]].show_price,
             status=ProductStatus.ACTIVE.value,
             in_stock=item["in_stock"],
             is_featured=item["is_featured"],

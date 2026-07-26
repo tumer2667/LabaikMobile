@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
-import { deleteProduct, fetchAdminProducts } from '@/features/catalog/api'
+import { deleteProduct, fetchAdminProducts, updateProduct } from '@/features/catalog/api'
 import { formatPkr } from '@/shared/lib/money'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
@@ -20,6 +20,17 @@ export function AdminProductsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteProduct(id),
+    onSuccess: () => {
+      setActionError(null)
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
+      void queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+    onError: (err) => setActionError(getApiErrorMessage(err)),
+  })
+
+  const togglePriceMutation = useMutation({
+    mutationFn: ({ id, show_price }: { id: string; show_price: boolean }) =>
+      updateProduct(id, { show_price }),
     onSuccess: () => {
       setActionError(null)
       void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
@@ -62,6 +73,7 @@ export function AdminProductsPage() {
                   <th className="px-4 py-3 font-semibold">Product</th>
                   <th className="px-4 py-3 font-semibold">Category</th>
                   <th className="px-4 py-3 font-semibold">Price</th>
+                  <th className="px-4 py-3 font-semibold">Show price</th>
                   <th className="px-4 py-3 font-semibold">Stock</th>
                   <th className="px-4 py-3 font-semibold text-right">Actions</th>
                 </tr>
@@ -84,7 +96,26 @@ export function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-3 text-ink-secondary">{p.category_name}</td>
                     <td className="px-4 py-3 text-ink">
-                      {p.show_price ? formatPkr(p.price_pkr) : 'Hidden on site'}
+                      {formatPkr(p.price_pkr)}
+                      {!p.show_price ? (
+                        <span className="ml-2 text-xs text-ink-muted">(hidden on site)</span>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-3">
+                      <label className="inline-flex items-center gap-2 text-xs text-ink-secondary">
+                        <input
+                          type="checkbox"
+                          checked={p.show_price}
+                          disabled={togglePriceMutation.isPending}
+                          onChange={(e) =>
+                            togglePriceMutation.mutate({
+                              id: p.id,
+                              show_price: e.target.checked,
+                            })
+                          }
+                        />
+                        {p.show_price ? 'Shown' : 'Hidden'}
+                      </label>
                     </td>
                     <td className="px-4 py-3">
                       <span className={p.in_stock ? 'text-brand-green-hover' : 'text-ink-muted'}>

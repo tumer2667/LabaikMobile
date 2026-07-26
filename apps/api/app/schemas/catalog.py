@@ -113,6 +113,7 @@ class ProductCreate(BaseModel):
     description: str = ""
     price_pkr: int = Field(ge=0)
     compare_at_pkr: int | None = Field(default=None, ge=0)
+    show_price: bool = True
     status: str = "active"
     in_stock: bool = True
     is_featured: bool = False
@@ -133,6 +134,7 @@ class ProductUpdate(BaseModel):
     description: str | None = None
     price_pkr: int | None = Field(default=None, ge=0)
     compare_at_pkr: int | None = Field(default=None, ge=0)
+    show_price: bool | None = None
     status: str | None = None
     in_stock: bool | None = None
     is_featured: bool | None = None
