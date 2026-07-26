@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.core.exceptions import AppError
 from app.domain.models.enums import (
     INVOICE_LIST_STATUSES,
+    PAYMENT_METHODS,
     InvoiceStatus,
     RefundStatus,
 )
@@ -71,6 +72,7 @@ def _to_list_item(invoice: Invoice, line_count: int | None = None) -> InvoiceLis
         total_pkr=invoice.total_pkr,
         refunded_pkr=refunded,
         remaining_pkr=max(0, invoice.total_pkr - refunded),
+        payment_method=invoice.payment_method or "cash",
         issued_at=invoice.issued_at,
         created_at=invoice.created_at,
         line_count=count,
@@ -206,6 +208,14 @@ def create_invoice(
     *,
     created_by_id: UUID | None = None,
 ) -> InvoiceDetail:
+    payment_method = (payload.payment_method or "cash").strip().lower()
+    if payment_method not in PAYMENT_METHODS:
+        raise AppError(
+            f"Invalid payment method. Allowed: {', '.join(sorted(PAYMENT_METHODS))}",
+            code="invalid_payment_method",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
     product_ids = [line.product_id for line in payload.lines]
     products = {
         p.id: p
@@ -246,6 +256,7 @@ def create_invoice(
                 description=product.name,
                 quantity=item.quantity,
                 unit_price_pkr=unit_price,
+                unit_cost_pkr=product.cost_pkr or 0,
                 line_total_pkr=line_total,
                 sort_order=index,
             )
@@ -264,6 +275,7 @@ def create_invoice(
         subtotal_pkr=subtotal,
         discount_pkr=discount,
         total_pkr=total,
+        payment_method=payment_method,
         created_by_id=created_by_id,
         issued_at=datetime.now(UTC),
         lines=built_lines,

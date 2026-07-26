@@ -29,6 +29,7 @@ class Invoice(Base):
     subtotal_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
     discount_pkr: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
+    payment_method: Mapped[str] = mapped_column(String(32), default="cash", nullable=False)
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
@@ -77,6 +78,7 @@ class InvoiceLine(Base):
     description: Mapped[str] = mapped_column(String(240), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     unit_price_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
+    unit_cost_pkr: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     line_total_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 

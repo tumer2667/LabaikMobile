@@ -10,6 +10,7 @@ export type InvoiceLine = {
   description: string
   quantity: number
   unit_price_pkr: number
+  unit_cost_pkr?: number
   line_total_pkr: number
   sort_order: number
 }
@@ -43,6 +44,7 @@ export type InvoiceListItem = {
   total_pkr: number
   refunded_pkr: number
   remaining_pkr: number
+  payment_method?: string
   issued_at: string
   created_at: string
   line_count: number
@@ -69,6 +71,7 @@ export type InvoiceCreatePayload = {
   customer_email?: string | null
   notes?: string
   discount_pkr?: number
+  payment_method?: string
   lines: InvoiceLineCreate[]
 }
 

@@ -16,6 +16,7 @@ class InvoiceCreate(BaseModel):
     customer_email: EmailStr | None = None
     notes: str = Field(default="", max_length=2000)
     discount_pkr: int = Field(default=0, ge=0)
+    payment_method: str = Field(default="cash", max_length=32)
     lines: list[InvoiceLineCreate] = Field(min_length=1)
 
 
@@ -32,6 +33,7 @@ class InvoiceLineResponse(BaseModel):
     description: str
     quantity: int
     unit_price_pkr: int
+    unit_cost_pkr: int = 0
     line_total_pkr: int
     sort_order: int
 
@@ -69,6 +71,7 @@ class InvoiceListItem(BaseModel):
     total_pkr: int
     refunded_pkr: int = 0
     remaining_pkr: int = 0
+    payment_method: str = "cash"
     issued_at: datetime
     created_at: datetime
     line_count: int = 0

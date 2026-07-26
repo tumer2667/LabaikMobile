@@ -46,6 +46,7 @@ export type ProductDetail = Product & {
   highlights: string[]
   status: string
   created_at: string
+  cost_pkr?: number
 }
 
 export type ProductListResponse = {

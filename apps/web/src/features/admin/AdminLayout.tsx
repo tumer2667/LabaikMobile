@@ -45,7 +45,9 @@ export function AdminLayout() {
 
   const nav: NavItem[] = isSuperAdmin
     ? [
-        ...baseNav.slice(0, 5),
+        ...baseNav.slice(0, 1),
+        { to: '/admin/finance', label: 'Finance' },
+        ...baseNav.slice(1, 5),
         {
           to: '/admin/invoice-review',
           label: 'Invoice review',

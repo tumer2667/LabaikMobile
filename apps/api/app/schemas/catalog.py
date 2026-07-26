@@ -65,6 +65,7 @@ class ProductDetail(ProductListItem):
     highlights: list[str]
     status: str
     created_at: datetime
+    cost_pkr: int = 0
 
 
 class ProductListResponse(BaseModel):
@@ -113,6 +114,7 @@ class ProductCreate(BaseModel):
     description: str = ""
     price_pkr: int = Field(ge=0)
     compare_at_pkr: int | None = Field(default=None, ge=0)
+    cost_pkr: int = Field(default=0, ge=0)
     show_price: bool = True
     status: str = "active"
     in_stock: bool = True
@@ -134,6 +136,7 @@ class ProductUpdate(BaseModel):
     description: str | None = None
     price_pkr: int | None = Field(default=None, ge=0)
     compare_at_pkr: int | None = Field(default=None, ge=0)
+    cost_pkr: int | None = Field(default=None, ge=0)
     show_price: bool | None = None
     status: str | None = None
     in_stock: bool | None = None

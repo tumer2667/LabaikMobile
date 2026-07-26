@@ -224,6 +224,12 @@ export function AdminInvoiceDetailPage() {
               <span>{formatPkr(invoice.total_pkr)}</span>
             </div>
             <div className="flex justify-between text-ink-secondary">
+              <span>Payment</span>
+              <span className="capitalize">
+                {(invoice.payment_method ?? 'cash').replaceAll('_', ' ')}
+              </span>
+            </div>
+            <div className="flex justify-between text-ink-secondary">
               <span>Refunded</span>
               <span>− {formatPkr(invoice.refunded_pkr)}</span>
             </div>

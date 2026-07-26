@@ -22,6 +22,7 @@ type FormState = {
   category_id: string
   price_pkr: string
   compare_at_pkr: string
+  cost_pkr: string
   short_description: string
   description: string
   image_urls: string
@@ -40,6 +41,7 @@ const emptyForm: FormState = {
   category_id: '',
   price_pkr: '',
   compare_at_pkr: '',
+  cost_pkr: '0',
   short_description: '',
   description: '',
   image_urls: '',
@@ -81,6 +83,7 @@ export function AdminProductFormPage() {
       category_id: p.category_id,
       price_pkr: String(p.price_pkr),
       compare_at_pkr: p.compare_at_pkr != null ? String(p.compare_at_pkr) : '',
+      cost_pkr: String(p.cost_pkr ?? 0),
       short_description: p.short_description,
       description: p.description,
       image_urls: p.images.join('\n'),
@@ -102,6 +105,7 @@ export function AdminProductFormPage() {
         category_id: form.category_id,
         price_pkr: Number(form.price_pkr),
         compare_at_pkr: form.compare_at_pkr ? Number(form.compare_at_pkr) : null,
+        cost_pkr: form.cost_pkr === '' ? 0 : Number(form.cost_pkr),
         short_description: form.short_description,
         description: form.description,
         image_urls: form.image_urls
@@ -262,6 +266,18 @@ export function AdminProductFormPage() {
               value={form.compare_at_pkr}
               onChange={(e) => setForm((f) => ({ ...f, compare_at_pkr: e.target.value }))}
             />
+          </Field>
+          <Field label="Cost (PKR)">
+            <input
+              type="number"
+              min={0}
+              className={inputClass}
+              value={form.cost_pkr}
+              onChange={(e) => setForm((f) => ({ ...f, cost_pkr: e.target.value }))}
+            />
+            <p className="mt-1 text-xs text-ink-muted">
+              Used for profit on the Finance dashboard (snapshotted onto invoices).
+            </p>
           </Field>
         </div>
 

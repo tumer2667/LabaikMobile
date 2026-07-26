@@ -64,6 +64,7 @@ def to_product_detail(product: Product) -> ProductDetail:
         highlights=list(product.highlights or []),
         status=product.status,
         created_at=product.created_at,
+        cost_pkr=product.cost_pkr,
     )
 
 
@@ -311,6 +312,7 @@ def create_product(db: Session, payload: ProductCreate) -> ProductDetail:
         description=payload.description,
         price_pkr=payload.price_pkr,
         compare_at_pkr=payload.compare_at_pkr,
+        cost_pkr=payload.cost_pkr,
         show_price=payload.show_price,
         status=payload.status,
         in_stock=payload.in_stock,

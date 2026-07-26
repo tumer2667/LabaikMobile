@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/api/client'
 import type { AuthResponse, AuthUser, LoginPayload } from '@/features/auth/types'
+import type { FinanceReport, FinanceReportParams } from '@/features/admin/financeTypes'
 
 export async function adminLogin(payload: LoginPayload): Promise<AuthResponse> {
   const { data } = await apiClient.post<AuthResponse>('/auth/admin/login', payload)
@@ -44,4 +45,11 @@ export async function createAdminUser(payload: {
 
 export async function deleteAdminUser(id: string): Promise<void> {
   await apiClient.delete(`/admin/users/${id}`)
+}
+
+export async function fetchFinanceReport(
+  params: FinanceReportParams = {},
+): Promise<FinanceReport> {
+  const { data } = await apiClient.get<FinanceReport>('/admin/finance/report', { params })
+  return data
 }

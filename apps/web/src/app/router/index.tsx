@@ -21,6 +21,7 @@ import { AdminInvoiceFormPage } from '@/features/admin/AdminInvoiceFormPage'
 import { AdminInvoiceDetailPage } from '@/features/admin/AdminInvoiceDetailPage'
 import { AdminInvoicePrintPage } from '@/features/admin/AdminInvoicePrintPage'
 import { AdminInvoiceReviewPage } from '@/features/admin/AdminInvoiceReviewPage'
+import { AdminFinancePage } from '@/features/admin/AdminFinancePage'
 import { RequireAdmin } from '@/features/admin/RequireAdmin'
 
 export const router = createBrowserRouter([
@@ -70,6 +71,7 @@ export const router = createBrowserRouter([
       { path: 'invoices/new', element: <AdminInvoiceFormPage /> },
       { path: 'invoices/:id', element: <AdminInvoiceDetailPage /> },
       { path: 'invoice-review', element: <AdminInvoiceReviewPage /> },
+      { path: 'finance', element: <AdminFinancePage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
     ],
   },

@@ -38,5 +38,17 @@ INVOICE_LIST_STATUSES = frozenset(
 )
 
 
+class PaymentMethod(StrEnum):
+    CASH = "cash"
+    JAZZCASH = "jazzcash"
+    EASYPAISA = "easypaisa"
+    BANK_TRANSFER = "bank_transfer"
+    CARD = "card"
+    OTHER = "other"
+
+
+PAYMENT_METHODS = frozenset(m.value for m in PaymentMethod)
+
+
 class RefundStatus(StrEnum):
     COMPLETED = "completed"

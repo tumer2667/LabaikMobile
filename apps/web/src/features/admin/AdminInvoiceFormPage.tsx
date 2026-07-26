@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createAdminInvoice } from '@/features/admin/invoicesApi'
+import { PAYMENT_METHOD_OPTIONS } from '@/features/admin/financeTypes'
 import { fetchAdminProducts } from '@/features/catalog/api'
 import { getApiErrorMessage } from '@/shared/api/client'
 import { formatPkr } from '@/shared/lib/money'
@@ -28,6 +29,7 @@ export function AdminInvoiceFormPage() {
   const [customerEmail, setCustomerEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [discount, setDiscount] = useState('0')
+  const [paymentMethod, setPaymentMethod] = useState('cash')
   const [productQuery, setProductQuery] = useState('')
   const [selectedProductId, setSelectedProductId] = useState('')
   const [lines, setLines] = useState<DraftLine[]>([])
@@ -89,6 +91,7 @@ export function AdminInvoiceFormPage() {
         customer_email: customerEmail.trim() || null,
         notes: notes.trim(),
         discount_pkr: Math.min(discountValue, subtotal),
+        payment_method: paymentMethod,
         lines: lines.map((l) => ({
           product_id: l.product_id,
           quantity: l.quantity,
@@ -280,6 +283,20 @@ export function AdminInvoiceFormPage() {
               value={discount}
               onChange={(e) => setDiscount(e.target.value)}
             />
+          </label>
+          <label className="text-sm font-medium text-ink">
+            Payment method
+            <select
+              className={inputClass}
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              {PAYMENT_METHOD_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="text-sm font-medium text-ink sm:col-span-2">
             Notes
