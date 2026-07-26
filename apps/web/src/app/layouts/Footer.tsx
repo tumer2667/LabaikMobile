@@ -21,102 +21,109 @@ export function Footer() {
   return (
     <footer className="relative mt-auto overflow-hidden text-white">
       <div className="absolute inset-0 bg-ink" />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/15 via-transparent to-brand-green/12" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 via-transparent to-brand-green/15" />
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-56 w-56 rounded-full bg-brand-blue/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 top-10 h-48 w-48 rounded-full bg-brand-green/15 blur-3xl" />
       <div className="relative h-1 w-full bg-brand-gradient" />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {/* Single-line CTA — no wide empty stretch */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 sm:px-5">
-          <p className="text-sm text-white/75">
-            <span className="font-display font-semibold text-white">Want to buy?</span>{' '}
-            WhatsApp or call us.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <a href={whatsappHref} target="_blank" rel="noreferrer">
-              <Button variant="gradient" size="sm">
-                WhatsApp
-              </Button>
-            </a>
-            <a href={`tel:${primary.tel}`}>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="border-white/20 bg-white/10 text-white hover:bg-white/20"
-              >
-                Call {primary.display}
-              </Button>
-            </a>
+      <div className="relative mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
+        {/* Brand + order CTA — one tight block on mobile */}
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-glow-blue">
+          <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3.5 sm:px-5">
+            <img
+              src={logo}
+              alt=""
+              className="h-10 w-10 rounded-xl bg-white object-contain p-0.5 ring-1 ring-white/20"
+            />
+            <div className="min-w-0">
+              <p className="font-display text-base font-semibold tracking-tight">{appConfig.name}</p>
+              <p className="text-xs text-white/55">
+                Phones & accessories · Prices in {appConfig.currency}
+              </p>
+            </div>
+          </div>
+
+          <div className="px-4 py-4 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4">
+            <p className="text-sm leading-snug text-white/75">
+              <span className="font-display font-semibold text-white">Want to buy?</span>
+              <span className="mt-0.5 block text-white/60 sm:mt-0 sm:ml-1.5 sm:inline">
+                WhatsApp or call — we help with stock and order.
+              </span>
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-0 sm:flex sm:shrink-0">
+              <a href={whatsappHref} target="_blank" rel="noreferrer" className="sm:inline-flex">
+                <Button variant="gradient" size="sm" className="w-full">
+                  WhatsApp
+                </Button>
+              </a>
+              <a href={`tel:${primary.tel}`} className="sm:inline-flex">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full border-white/20 bg-white/10 text-white hover:bg-white/20"
+                >
+                  Call
+                </Button>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Even 4-column grid — equal gaps, no justify-between void */}
-        <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <Link to="/" className="inline-flex items-center gap-2.5">
-              <img
-                src={logo}
-                alt=""
-                className="h-9 w-9 rounded-lg bg-white object-contain p-0.5 ring-1 ring-white/15"
-              />
-              <span className="font-display text-base font-semibold tracking-tight">
-                {appConfig.name}
-              </span>
-            </Link>
-            <p className="mt-3 text-sm leading-snug text-white/55">
-              Phones & accessories.
-              <br />
-              Prices in {appConfig.currency}.
-            </p>
-          </div>
+        {/* Pages as chips on mobile; list on desktop */}
+        <div className="mt-6 sm:mt-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
+            Pages
+          </p>
+          <nav aria-label="Footer" className="mt-3 flex flex-wrap gap-2">
+            {quickLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1.5 text-sm font-semibold text-white/80 transition hover:border-brand-blue/40 hover:bg-brand-blue/15 hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
-              Pages
+        {/* Address + contact cards */}
+        <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-green">
+              Visit shop
             </p>
-            <nav aria-label="Footer" className="mt-3 flex flex-col gap-1.5">
-              {quickLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="w-fit text-sm font-medium text-white/70 transition hover:text-brand-blue"
-                >
-                  {link.label}
-                </Link>
+            <p className="mt-2 text-sm leading-relaxed text-white/75">
+              {businessInfo.addressLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
               ))}
-            </nav>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
-              Address
-            </p>
-            <p className="mt-3 text-sm leading-snug text-white/70">
-              Shop # 5, Block # 1
-              <br />
-              Near Ali Computer College
-              <br />
-              Karim Park, Lahore
             </p>
             <a
               href={mapsOpenUrl()}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-block text-sm font-semibold text-brand-blue transition hover:text-white"
+              className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue transition hover:text-white"
             >
-              Google Maps →
+              Open Google Maps
+              <span aria-hidden>→</span>
             </a>
           </div>
 
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
-              Contact
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-green">
+              Call / WhatsApp
             </p>
-            <ul className="mt-3 space-y-1.5 text-sm">
+            <ul className="mt-2 space-y-2">
               {businessInfo.phones.map((phone) => (
-                <li key={phone.tel}>
+                <li
+                  key={phone.tel}
+                  className="flex items-center justify-between gap-2 rounded-xl bg-white/[0.05] px-3 py-2"
+                >
                   <a
                     href={`tel:${phone.tel}`}
-                    className="font-semibold text-brand-blue transition hover:text-white"
+                    className="text-sm font-semibold text-white transition hover:text-brand-blue"
                   >
                     {phone.display}
                   </a>
@@ -124,16 +131,16 @@ export function Footer() {
                     href={whatsappUrl(phone.whatsapp)}
                     target="_blank"
                     rel="noreferrer"
-                    className="ml-2 text-[10px] font-bold uppercase tracking-wide text-brand-green transition hover:text-white"
+                    className="rounded-full bg-brand-green/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-green transition hover:bg-brand-green hover:text-white"
                   >
-                    WA
+                    WhatsApp
                   </a>
                 </li>
               ))}
             </ul>
             <a
               href={`mailto:${businessInfo.email}`}
-              className="mt-3 block text-sm text-white/55 transition hover:text-brand-blue"
+              className="mt-3 block truncate text-sm text-white/55 transition hover:text-brand-blue"
             >
               {businessInfo.email}
             </a>
@@ -141,14 +148,12 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="relative border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 text-xs text-white/35 sm:px-6">
+      <div className="relative border-t border-white/10 bg-black/20">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-1 px-4 py-3.5 text-center text-xs text-white/40 sm:flex-row sm:px-6 sm:text-left">
           <span>
             © {year} {appConfig.name}
           </span>
-          <span>
-            Lahore · {appConfig.currency}
-          </span>
+          <span>Karim Park, Lahore · {appConfig.currency}</span>
         </div>
       </div>
     </footer>

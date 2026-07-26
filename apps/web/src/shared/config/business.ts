@@ -1,7 +1,7 @@
 /** Public storefront business details — Lahore shop */
 export const businessInfo = {
   name: 'LabaikMobiles',
-  email: 'hello@labaikmobiles.com',
+  email: 'tumer2667@gmail.com',
   address: 'Shop # 5, Block # 1, Near Ali Computer College, Karim Park, Lahore',
   addressLines: [
     'Shop # 5, Block # 1',
