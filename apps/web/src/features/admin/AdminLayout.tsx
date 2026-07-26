@@ -12,7 +12,7 @@ const baseNav = [
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/brands', label: 'Brands' },
-  { to: '/admin/orders', label: 'Orders' },
+  { to: '/admin/invoices', label: 'Invoices' },
   { to: '/admin/settings', label: 'Settings' },
 ] as const
 
@@ -30,6 +30,7 @@ export function AdminLayout() {
   const nav = isSuperAdmin
     ? [
         ...baseNav.slice(0, 5),
+        { to: '/admin/invoice-review', label: 'Invoice review' },
         { to: '/admin/users', label: 'Users' },
         ...baseNav.slice(5),
       ]
