@@ -64,16 +64,16 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-dvh bg-[#0b1220] text-white">
-      <aside className="hidden w-64 shrink-0 border-r border-white/10 bg-[#0e1628] md:flex md:flex-col">
-        <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
+    <div className="flex h-dvh overflow-hidden bg-[#0b1220] text-white">
+      <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-white/10 bg-[#0e1628] md:flex">
+        <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-5 py-5">
           <img src={logo} alt="" className="h-9 w-9 rounded-lg bg-white object-contain p-0.5" />
           <div>
             <p className="font-display text-sm font-semibold">{appConfig.name}</p>
             <p className="text-xs text-white/50">{roleLabel(user?.role)}</p>
           </div>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Admin">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Admin">
           {nav.map((item) => {
             const count =
               item.countKey && stats ? (stats[item.countKey] ?? null) : null
@@ -105,7 +105,7 @@ export function AdminLayout() {
             )
           })}
         </nav>
-        <div className="border-t border-white/10 p-4">
+        <div className="shrink-0 border-t border-white/10 bg-[#0e1628] p-4">
           <p className="truncate text-sm font-medium">{user?.full_name || 'Admin'}</p>
           <p className="truncate text-xs text-white/50">{user?.email}</p>
           <p className="mt-1 text-[11px] text-white/40">{roleLabel(user?.role)}</p>
@@ -122,8 +122,8 @@ export function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-8">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3 md:px-8">
           <div className="md:hidden">
             <p className="font-display font-semibold">{appConfig.name}</p>
             <p className="truncate text-xs text-white/50">{user?.full_name}</p>
@@ -141,7 +141,7 @@ export function AdminLayout() {
         <motion.main
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex-1 overflow-auto bg-surface p-4 text-ink md:p-8"
+          className="min-h-0 flex-1 overflow-y-auto bg-surface p-4 text-ink md:p-8"
         >
           <Outlet />
         </motion.main>
