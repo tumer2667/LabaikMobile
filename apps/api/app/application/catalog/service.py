@@ -404,15 +404,34 @@ def delete_brand(db: Session, brand_id: UUID) -> None:
 
 
 def dashboard_stats(db: Session) -> dict:
+    from app.domain.models.enums import INVOICE_LIST_STATUSES, InvoiceStatus, STAFF_ROLES
+    from app.infrastructure.db.models import Invoice, User
+
     products = db.scalar(
         select(func.count()).select_from(Product).where(Product.status != ProductStatus.ARCHIVED.value)
     )
     categories = db.scalar(select(func.count()).select_from(Category))
     brands = db.scalar(select(func.count()).select_from(Brand))
+    invoices = db.scalar(
+        select(func.count())
+        .select_from(Invoice)
+        .where(Invoice.status.in_(INVOICE_LIST_STATUSES))
+    )
+    invoice_review = db.scalar(
+        select(func.count())
+        .select_from(Invoice)
+        .where(Invoice.status == InvoiceStatus.PENDING_DELETE.value)
+    )
+    users = db.scalar(
+        select(func.count()).select_from(User).where(User.role.in_(STAFF_ROLES))
+    )
     return {
         "products": int(products or 0),
         "categories": int(categories or 0),
         "brands": int(brands or 0),
+        "invoices": int(invoices or 0),
+        "invoice_review": int(invoice_review or 0),
+        "users": int(users or 0),
         "orders": 0,
         "customers": 0,
     }

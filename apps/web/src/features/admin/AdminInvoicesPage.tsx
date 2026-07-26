@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 import {
+  fetchAdminInvoiceByNumber,
   fetchAdminInvoices,
   fetchInvoiceCreators,
   requestDeleteAdminInvoice,
@@ -20,10 +21,27 @@ function formatDate(value: string) {
   }).format(new Date(value))
 }
 
+function statusLabel(status: string) {
+  if (status === 'partially_refunded') return 'Partial refund'
+  if (status === 'refunded') return 'Refunded'
+  if (status === 'pending_delete') return 'In review'
+  return 'Issued'
+}
+
+function statusClass(status: string) {
+  if (status === 'refunded') return 'text-danger'
+  if (status === 'partially_refunded') return 'text-amber-700'
+  if (status === 'pending_delete') return 'text-danger'
+  return 'text-brand-green-hover'
+}
+
 export function AdminInvoicesPage() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [error, setError] = useState<string | null>(null)
   const [creatorId, setCreatorId] = useState('')
+  const [lookupNumber, setLookupNumber] = useState('')
+  const [lookupPending, setLookupPending] = useState(false)
 
   const creatorsQuery = useQuery({
     queryKey: ['admin', 'invoice-creators'],
@@ -34,7 +52,6 @@ export function AdminInvoicesPage() {
     queryKey: ['admin', 'invoices', creatorId || 'all'],
     queryFn: () =>
       fetchAdminInvoices({
-        status: 'issued',
         ...(creatorId ? { created_by: creatorId } : {}),
       }),
   })
@@ -45,9 +62,25 @@ export function AdminInvoicesPage() {
       setError(null)
       void queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] })
       void queryClient.invalidateQueries({ queryKey: ['admin', 'invoice-review'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
     },
     onError: (err) => setError(getApiErrorMessage(err)),
   })
+
+  const onLookup = async () => {
+    const number = lookupNumber.trim()
+    if (!number) return
+    setLookupPending(true)
+    setError(null)
+    try {
+      const invoice = await fetchAdminInvoiceByNumber(number)
+      navigate(`/admin/invoices/${invoice.id}`)
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Invoice number not found'))
+    } finally {
+      setLookupPending(false)
+    }
+  }
 
   const invoices = data ?? []
 
@@ -57,7 +90,7 @@ export function AdminInvoicesPage() {
         <div>
           <h1 className="font-display text-3xl font-semibold text-ink">Invoices</h1>
           <p className="mt-1 text-sm text-ink-secondary">
-            Create invoices from in-stock products. Deleting sends them to review for super admin.
+            Track invoices by number (INV-…). Process refunds from the invoice detail page.
           </p>
         </div>
         <Link to="/admin/invoices/new">
@@ -66,6 +99,21 @@ export function AdminInvoicesPage() {
       </div>
 
       <Card className="flex flex-wrap items-end gap-3">
+        <label className="min-w-[220px] flex-1 text-sm font-medium text-ink">
+          Find by invoice number
+          <input
+            className="mt-1.5 w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-blue"
+            value={lookupNumber}
+            onChange={(e) => setLookupNumber(e.target.value)}
+            placeholder="e.g. INV-2026-0001"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') void onLookup()
+            }}
+          />
+        </label>
+        <Button disabled={!lookupNumber.trim() || lookupPending} onClick={() => void onLookup()}>
+          {lookupPending ? 'Searching…' : 'Open'}
+        </Button>
         <label className="min-w-[220px] text-sm font-medium text-ink">
           Filter by creator
           <select
@@ -105,6 +153,7 @@ export function AdminInvoicesPage() {
                   <th className="px-4 py-3 font-semibold">Created by</th>
                   <th className="px-4 py-3 font-semibold">Date</th>
                   <th className="px-4 py-3 font-semibold">Total</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
@@ -122,7 +171,17 @@ export function AdminInvoicesPage() {
                       {inv.created_by_name ?? '—'}
                     </td>
                     <td className="px-4 py-3 text-ink-secondary">{formatDate(inv.issued_at)}</td>
-                    <td className="px-4 py-3 text-ink">{formatPkr(inv.total_pkr)}</td>
+                    <td className="px-4 py-3 text-ink">
+                      <p>{formatPkr(inv.total_pkr)}</p>
+                      {inv.refunded_pkr > 0 ? (
+                        <p className="text-xs text-ink-muted">
+                          Refunded {formatPkr(inv.refunded_pkr)}
+                        </p>
+                      ) : null}
+                    </td>
+                    <td className={`px-4 py-3 ${statusClass(inv.status)}`}>
+                      {statusLabel(inv.status)}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center justify-end gap-2">
                         <Link to={`/admin/invoices/${inv.id}`}>

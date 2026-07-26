@@ -5,6 +5,7 @@ import type {
   InvoiceDetail,
   InvoiceListItem,
   InvoiceListParams,
+  RefundCreatePayload,
 } from '@/features/admin/invoiceTypes'
 
 export async function fetchAdminInvoices(
@@ -24,8 +25,26 @@ export async function fetchAdminInvoice(id: string): Promise<InvoiceDetail> {
   return data
 }
 
+export async function fetchAdminInvoiceByNumber(number: string): Promise<InvoiceDetail> {
+  const { data } = await apiClient.get<InvoiceDetail>(
+    `/admin/invoices/by-number/${encodeURIComponent(number)}`,
+  )
+  return data
+}
+
 export async function createAdminInvoice(payload: InvoiceCreatePayload): Promise<InvoiceDetail> {
   const { data } = await apiClient.post<InvoiceDetail>('/admin/invoices', payload)
+  return data
+}
+
+export async function createAdminRefund(
+  invoiceId: string,
+  payload: RefundCreatePayload,
+): Promise<InvoiceDetail> {
+  const { data } = await apiClient.post<InvoiceDetail>(
+    `/admin/invoices/${invoiceId}/refunds`,
+    payload,
+  )
   return data
 }
 

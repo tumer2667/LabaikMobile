@@ -11,6 +11,9 @@ export async function fetchAdminDashboard(): Promise<{
     products: number
     categories: number
     brands?: number
+    invoices?: number
+    invoice_review?: number
+    users?: number
     orders: number
     customers: number
   }

@@ -160,8 +160,46 @@ export function AdminInvoicePrintPage() {
               <span>Total</span>
               <span>{formatPkr(invoice.total_pkr)}</span>
             </div>
+            {invoice.refunded_pkr > 0 ? (
+              <>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>Refunded</span>
+                  <span>− {formatPkr(invoice.refunded_pkr)}</span>
+                </div>
+                <div className="flex justify-between font-semibold text-ink">
+                  <span>Remaining</span>
+                  <span>{formatPkr(invoice.remaining_pkr)}</span>
+                </div>
+              </>
+            ) : null}
           </div>
         </section>
+
+        {(invoice.refunds ?? []).length > 0 ? (
+          <section className="mt-8 border-t border-border pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              Refunds
+            </p>
+            <table className="mt-2 w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wider">
+                  <th className="pb-1 font-semibold">Refund #</th>
+                  <th className="pb-1 font-semibold">Amount</th>
+                  <th className="pb-1 font-semibold">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoice.refunds.map((refund) => (
+                  <tr key={refund.id} className="border-b border-border/70">
+                    <td className="py-2 pr-3">{refund.number}</td>
+                    <td className="py-2 pr-3">{formatPkr(refund.amount_pkr)}</td>
+                    <td className="py-2">{refund.reason || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        ) : null}
 
         {invoice.notes ? (
           <section className="mt-8 border-t border-border pt-4">

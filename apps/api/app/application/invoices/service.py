@@ -1,4 +1,4 @@
-"""Admin invoice creation and lookup."""
+"""Admin invoice creation, refunds, and lookup."""
 
 from __future__ import annotations
 
@@ -10,14 +10,20 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.exceptions import AppError
-from app.domain.models.enums import InvoiceStatus
-from app.infrastructure.db.models import Invoice, InvoiceLine, Product, User
+from app.domain.models.enums import (
+    INVOICE_LIST_STATUSES,
+    InvoiceStatus,
+    RefundStatus,
+)
+from app.infrastructure.db.models import Invoice, InvoiceLine, InvoiceRefund, Product, User
 from app.schemas.invoice import (
     InvoiceCreate,
     InvoiceCreatorOption,
     InvoiceDetail,
     InvoiceLineResponse,
     InvoiceListItem,
+    RefundCreate,
+    RefundResponse,
 )
 
 
@@ -27,12 +33,33 @@ def _creator_name(invoice: Invoice) -> str | None:
     return None
 
 
+def _refunded_total(invoice: Invoice) -> int:
+    return sum(r.amount_pkr for r in invoice.refunds)
+
+
+def _to_refund_response(refund: InvoiceRefund, invoice_number: str) -> RefundResponse:
+    created_by_name = refund.created_by.full_name if refund.created_by is not None else None
+    return RefundResponse(
+        id=refund.id,
+        number=refund.number,
+        invoice_id=refund.invoice_id,
+        invoice_number=invoice_number,
+        amount_pkr=refund.amount_pkr,
+        reason=refund.reason,
+        status=refund.status,
+        created_by_id=refund.created_by_id,
+        created_by_name=created_by_name,
+        created_at=refund.created_at,
+    )
+
+
 def _to_line_response(line: InvoiceLine) -> InvoiceLineResponse:
     return InvoiceLineResponse.model_validate(line)
 
 
 def _to_list_item(invoice: Invoice, line_count: int | None = None) -> InvoiceListItem:
     count = line_count if line_count is not None else len(invoice.lines)
+    refunded = _refunded_total(invoice)
     return InvoiceListItem(
         id=invoice.id,
         number=invoice.number,
@@ -42,6 +69,8 @@ def _to_list_item(invoice: Invoice, line_count: int | None = None) -> InvoiceLis
         subtotal_pkr=invoice.subtotal_pkr,
         discount_pkr=invoice.discount_pkr,
         total_pkr=invoice.total_pkr,
+        refunded_pkr=refunded,
+        remaining_pkr=max(0, invoice.total_pkr - refunded),
         issued_at=invoice.issued_at,
         created_at=invoice.created_at,
         line_count=count,
@@ -57,6 +86,7 @@ def _to_detail(invoice: Invoice) -> InvoiceDetail:
         customer_email=invoice.customer_email,
         notes=invoice.notes,
         lines=[_to_line_response(line) for line in invoice.lines],
+        refunds=[_to_refund_response(r, invoice.number) for r in invoice.refunds],
     )
 
 
@@ -64,6 +94,7 @@ def _invoice_query():
     return select(Invoice).options(
         selectinload(Invoice.lines),
         selectinload(Invoice.created_by),
+        selectinload(Invoice.refunds).selectinload(InvoiceRefund.created_by),
     )
 
 
@@ -96,6 +127,36 @@ def _next_invoice_number(db: Session) -> str:
     return f"{prefix}{seq:04d}"
 
 
+def _next_refund_number(db: Session) -> str:
+    year = datetime.now(UTC).year
+    prefix = f"REF-{year}-"
+    latest = db.scalar(
+        select(InvoiceRefund.number)
+        .where(InvoiceRefund.number.like(f"{prefix}%"))
+        .order_by(InvoiceRefund.number.desc())
+        .limit(1)
+    )
+    seq = 1
+    if latest:
+        try:
+            seq = int(latest.rsplit("-", 1)[-1]) + 1
+        except ValueError:
+            seq = 1
+    return f"{prefix}{seq:04d}"
+
+
+def _sync_invoice_refund_status(invoice: Invoice) -> None:
+    if invoice.status == InvoiceStatus.PENDING_DELETE.value:
+        return
+    refunded = _refunded_total(invoice)
+    if refunded <= 0:
+        invoice.status = InvoiceStatus.ISSUED.value
+    elif refunded >= invoice.total_pkr:
+        invoice.status = InvoiceStatus.REFUNDED.value
+    else:
+        invoice.status = InvoiceStatus.PARTIALLY_REFUNDED.value
+
+
 def list_invoice_creators(db: Session) -> list[InvoiceCreatorOption]:
     rows = db.execute(
         select(User.id, User.full_name)
@@ -118,14 +179,25 @@ def list_invoices(
     if status_filter:
         stmt = stmt.where(Invoice.status == status_filter)
     else:
-        # Main list excludes invoices waiting for deletion review.
-        stmt = stmt.where(Invoice.status == InvoiceStatus.ISSUED.value)
+        stmt = stmt.where(Invoice.status.in_(INVOICE_LIST_STATUSES))
     invoices = list(db.scalars(stmt))
     return [_to_list_item(inv) for inv in invoices]
 
 
 def get_invoice(db: Session, invoice_id: UUID) -> InvoiceDetail:
     return _to_detail(_get_invoice_or_404(db, invoice_id))
+
+
+def get_invoice_by_number(db: Session, number: str) -> InvoiceDetail:
+    cleaned = number.strip().upper()
+    invoice = db.scalar(_invoice_query().where(Invoice.number == cleaned))
+    if invoice is None:
+        raise AppError(
+            "Invoice not found",
+            code="invoice_not_found",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    return _to_detail(invoice)
 
 
 def create_invoice(
@@ -201,14 +273,62 @@ def create_invoice(
     return get_invoice(db, invoice.id)
 
 
+def create_refund(
+    db: Session,
+    invoice_id: UUID,
+    payload: RefundCreate,
+    *,
+    created_by_id: UUID | None = None,
+) -> InvoiceDetail:
+    invoice = _get_invoice_or_404(db, invoice_id)
+    if invoice.status == InvoiceStatus.PENDING_DELETE.value:
+        raise AppError(
+            "Cannot refund an invoice that is pending deletion.",
+            code="invoice_pending_delete",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    if invoice.status == InvoiceStatus.REFUNDED.value:
+        raise AppError(
+            "Invoice is already fully refunded.",
+            code="invoice_already_refunded",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    remaining = invoice.total_pkr - _refunded_total(invoice)
+    if payload.amount_pkr > remaining:
+        raise AppError(
+            f"Refund amount exceeds remaining balance ({remaining} PKR).",
+            code="refund_exceeds_remaining",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details={"remaining_pkr": remaining},
+        )
+
+    refund = InvoiceRefund(
+        number=_next_refund_number(db),
+        invoice_id=invoice.id,
+        amount_pkr=payload.amount_pkr,
+        reason=payload.reason.strip(),
+        status=RefundStatus.COMPLETED.value,
+        created_by_id=created_by_id,
+    )
+    db.add(refund)
+    db.flush()
+    # Refresh refunds collection for status sync
+    invoice.refunds.append(refund)
+    _sync_invoice_refund_status(invoice)
+    db.add(invoice)
+    db.commit()
+    return get_invoice(db, invoice.id)
+
+
 def request_delete_invoice(db: Session, invoice_id: UUID) -> InvoiceDetail:
-    """Admin (or super admin) moves an issued invoice into deletion review."""
+    """Admin (or super admin) moves an invoice into deletion review."""
     invoice = _get_invoice_or_404(db, invoice_id)
     if invoice.status == InvoiceStatus.PENDING_DELETE.value:
         return _to_detail(invoice)
-    if invoice.status != InvoiceStatus.ISSUED.value:
+    if invoice.status not in INVOICE_LIST_STATUSES:
         raise AppError(
-            "Only issued invoices can be sent for deletion review.",
+            "Only active invoices can be sent for deletion review.",
             code="invoice_not_deletable",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -236,7 +356,7 @@ def invoice_count(db: Session) -> int:
         db.scalar(
             select(func.count())
             .select_from(Invoice)
-            .where(Invoice.status == InvoiceStatus.ISSUED.value)
+            .where(Invoice.status.in_(INVOICE_LIST_STATUSES))
         )
         or 0
     )

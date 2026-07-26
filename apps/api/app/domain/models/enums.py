@@ -23,4 +23,20 @@ class ProductStatus(StrEnum):
 
 class InvoiceStatus(StrEnum):
     ISSUED = "issued"
+    PARTIALLY_REFUNDED = "partially_refunded"
+    REFUNDED = "refunded"
     PENDING_DELETE = "pending_delete"  # admin requested deletion; awaits super admin
+
+
+# Shown on the main invoices list (excludes deletion review).
+INVOICE_LIST_STATUSES = frozenset(
+    {
+        InvoiceStatus.ISSUED.value,
+        InvoiceStatus.PARTIALLY_REFUNDED.value,
+        InvoiceStatus.REFUNDED.value,
+    }
+)
+
+
+class RefundStatus(StrEnum):
+    COMPLETED = "completed"

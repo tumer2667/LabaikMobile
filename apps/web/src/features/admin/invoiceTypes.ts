@@ -1,4 +1,8 @@
-export type InvoiceStatus = 'issued' | 'pending_delete'
+export type InvoiceStatus =
+  | 'issued'
+  | 'partially_refunded'
+  | 'refunded'
+  | 'pending_delete'
 
 export type InvoiceLine = {
   id: string
@@ -8,6 +12,19 @@ export type InvoiceLine = {
   unit_price_pkr: number
   line_total_pkr: number
   sort_order: number
+}
+
+export type InvoiceRefund = {
+  id: string
+  number: string
+  invoice_id: string
+  invoice_number: string
+  amount_pkr: number
+  reason: string
+  status: string
+  created_by_id: string | null
+  created_by_name: string | null
+  created_at: string
 }
 
 export type InvoiceCreatorOption = {
@@ -24,6 +41,8 @@ export type InvoiceListItem = {
   subtotal_pkr: number
   discount_pkr: number
   total_pkr: number
+  refunded_pkr: number
+  remaining_pkr: number
   issued_at: string
   created_at: string
   line_count: number
@@ -35,6 +54,7 @@ export type InvoiceDetail = InvoiceListItem & {
   customer_email: string | null
   notes: string
   lines: InvoiceLine[]
+  refunds: InvoiceRefund[]
 }
 
 export type InvoiceLineCreate = {
@@ -50,6 +70,11 @@ export type InvoiceCreatePayload = {
   notes?: string
   discount_pkr?: number
   lines: InvoiceLineCreate[]
+}
+
+export type RefundCreatePayload = {
+  amount_pkr: number
+  reason?: string
 }
 
 export type InvoiceListParams = {

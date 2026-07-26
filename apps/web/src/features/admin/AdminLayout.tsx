@@ -1,20 +1,29 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 
 import logo from '@/assets/logo.png'
 import { appConfig } from '@/shared/config/env'
+import { fetchAdminDashboard } from '@/features/admin/api'
 import { useAuth } from '@/features/auth/AuthContext'
 import { Button } from '@/shared/ui/Button'
 import { cn } from '@/shared/lib/cn'
 
-const baseNav = [
+type NavItem = {
+  to: string
+  label: string
+  end?: boolean
+  countKey?: 'categories' | 'invoices' | 'invoice_review' | 'users'
+}
+
+const baseNav: NavItem[] = [
   { to: '/admin', label: 'Dashboard', end: true },
   { to: '/admin/products', label: 'Products' },
-  { to: '/admin/categories', label: 'Categories' },
+  { to: '/admin/categories', label: 'Categories', countKey: 'categories' },
   { to: '/admin/brands', label: 'Brands' },
-  { to: '/admin/invoices', label: 'Invoices' },
+  { to: '/admin/invoices', label: 'Invoices', countKey: 'invoices' },
   { to: '/admin/settings', label: 'Settings' },
-] as const
+]
 
 function roleLabel(role: string | undefined) {
   if (role === 'super_admin') return 'Super admin'
@@ -27,11 +36,22 @@ export function AdminLayout() {
   const navigate = useNavigate()
   const isSuperAdmin = user?.role === 'super_admin'
 
-  const nav = isSuperAdmin
+  const dashQuery = useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: fetchAdminDashboard,
+    staleTime: 30_000,
+  })
+  const stats = dashQuery.data?.stats
+
+  const nav: NavItem[] = isSuperAdmin
     ? [
         ...baseNav.slice(0, 5),
-        { to: '/admin/invoice-review', label: 'Invoice review' },
-        { to: '/admin/users', label: 'Users' },
+        {
+          to: '/admin/invoice-review',
+          label: 'Invoice review',
+          countKey: 'invoice_review',
+        },
+        { to: '/admin/users', label: 'Users', countKey: 'users' },
         ...baseNav.slice(5),
       ]
     : [...baseNav]
@@ -52,22 +72,36 @@ export function AdminLayout() {
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Admin">
-          {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={'end' in item ? Boolean(item.end) : false}
-              className={({ isActive }) =>
-                cn(
-                  'rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition',
-                  'hover:bg-white/5 hover:text-white',
-                  isActive && 'bg-brand-blue/20 text-brand-blue',
-                )
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {nav.map((item) => {
+            const count =
+              item.countKey && stats ? (stats[item.countKey] ?? null) : null
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={Boolean(item.end)}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition',
+                    'hover:bg-white/5 hover:text-white',
+                    isActive && 'bg-brand-blue/20 text-brand-blue',
+                  )
+                }
+              >
+                <span>{item.label}</span>
+                {count != null ? (
+                  <span
+                    className={cn(
+                      'min-w-6 rounded-full px-1.5 py-0.5 text-center text-[11px] font-semibold tabular-nums',
+                      'bg-white/10 text-white/70',
+                    )}
+                  >
+                    {count}
+                  </span>
+                ) : null}
+              </NavLink>
+            )
+          })}
         </nav>
         <div className="border-t border-white/10 p-4">
           <p className="truncate text-sm font-medium">{user?.full_name || 'Admin'}</p>

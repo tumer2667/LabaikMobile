@@ -19,6 +19,11 @@ class InvoiceCreate(BaseModel):
     lines: list[InvoiceLineCreate] = Field(min_length=1)
 
 
+class RefundCreate(BaseModel):
+    amount_pkr: int = Field(ge=1)
+    reason: str = Field(default="", max_length=2000)
+
+
 class InvoiceLineResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,6 +34,21 @@ class InvoiceLineResponse(BaseModel):
     unit_price_pkr: int
     line_total_pkr: int
     sort_order: int
+
+
+class RefundResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    number: str
+    invoice_id: UUID
+    invoice_number: str
+    amount_pkr: int
+    reason: str
+    status: str
+    created_by_id: UUID | None
+    created_by_name: str | None = None
+    created_at: datetime
 
 
 class InvoiceCreatorOption(BaseModel):
@@ -47,6 +67,8 @@ class InvoiceListItem(BaseModel):
     subtotal_pkr: int
     discount_pkr: int
     total_pkr: int
+    refunded_pkr: int = 0
+    remaining_pkr: int = 0
     issued_at: datetime
     created_at: datetime
     line_count: int = 0
@@ -58,3 +80,4 @@ class InvoiceDetail(InvoiceListItem):
     customer_email: str | None
     notes: str
     lines: list[InvoiceLineResponse]
+    refunds: list[RefundResponse] = Field(default_factory=list)

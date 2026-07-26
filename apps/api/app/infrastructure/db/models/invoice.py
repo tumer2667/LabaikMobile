@@ -50,6 +50,11 @@ class Invoice(Base):
         cascade="all, delete-orphan",
         order_by="InvoiceLine.sort_order",
     )
+    refunds: Mapped[list[InvoiceRefund]] = relationship(
+        back_populates="invoice",
+        cascade="all, delete-orphan",
+        order_by="InvoiceRefund.created_at",
+    )
     created_by: Mapped[User | None] = relationship("User", foreign_keys=[created_by_id])
 
 
@@ -76,3 +81,33 @@ class InvoiceLine(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     invoice: Mapped[Invoice] = relationship(back_populates="lines")
+
+
+class InvoiceRefund(Base):
+    """Refund against an issued invoice; tracked by REF-YYYY-#### and invoice number."""
+
+    __tablename__ = "invoice_refunds"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    number: Mapped[str] = mapped_column(String(32), unique=True, index=True, nullable=False)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("invoices.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    amount_pkr: Mapped[int] = mapped_column(Integer, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="completed", nullable=False)
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    invoice: Mapped[Invoice] = relationship(back_populates="refunds")
+    created_by: Mapped[User | None] = relationship("User", foreign_keys=[created_by_id])
