@@ -128,15 +128,16 @@ npm run dev
 
 ## Admin image uploads (Supabase Storage)
 
-1. Supabase → **Storage** → New bucket named `product-images` → **Public**
-2. Render API env:
-   - `SUPABASE_URL=https://ufmfvvvmrguouzhriurv.supabase.co`
+1. Supabase → **Storage** → New bucket named `product-images`
+2. Turn **Public bucket** ON (required — otherwise the shop shows “Image unavailable”)
+3. Render API env:
+   - `SUPABASE_URL=https://YOUR_PROJECT.supabase.co`
    - `SUPABASE_SERVICE_ROLE_KEY=` (Settings → API → service_role secret)
    - `SUPABASE_STORAGE_BUCKET=product-images`
-3. Redeploy API
-4. Admin → Products → **Upload images** (no need to paste URLs)
+4. Redeploy API
+5. Admin → Categories / Products → **Upload image** → **Save changes**
 
-
+If an old upload still shows “Image unavailable”, open that category/product, upload the image again, and save.
 
 | Problem | Fix |
 |---------|-----|
@@ -145,6 +146,7 @@ npm run dev
 | CORS blocked in browser | Put exact Vercel URL in Render `CORS_ORIGINS` |
 | DB connection failed | Check Supabase password/URI; add `?sslmode=require` if needed |
 | Admin login fails | Confirm `ADMIN_EMAIL` / `ADMIN_PASSWORD` on Render |
+| Uploaded image = “Image unavailable” | Make `product-images` bucket **Public**, then re-upload and save |
 
 ---
 

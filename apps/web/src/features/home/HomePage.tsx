@@ -14,7 +14,7 @@ import { Skeleton } from '@/shared/ui/Skeleton'
 import { fadeUp, staggerContainer } from '@/shared/lib/motion'
 
 const heroImage =
-  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1800&q=80'
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=70&fm=webp'
 
 const trustItems = [
   {
@@ -189,7 +189,7 @@ export function HomePage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {categories.map((category, index) => (
                 <Reveal key={category.id} delay={index * 0.04}>
-                  <CategoryCard category={category} />
+                  <CategoryCard category={category} priority={index < 4} />
                 </Reveal>
               ))}
             </div>

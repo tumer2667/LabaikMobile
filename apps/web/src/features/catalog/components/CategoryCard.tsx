@@ -8,9 +8,10 @@ import { cn } from '@/shared/lib/cn'
 type CategoryCardProps = {
   category: Category
   className?: string
+  priority?: boolean
 }
 
-export function CategoryCard({ category, className }: CategoryCardProps) {
+export function CategoryCard({ category, className, priority = false }: CategoryCardProps) {
   return (
     <motion.div
       whileHover={{ y: -6 }}
@@ -28,6 +29,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
           alt={category.name}
           className="aspect-[4/3]"
           imgClassName="transition duration-700 group-hover:scale-110"
+          priority={priority}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent" />
         <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">

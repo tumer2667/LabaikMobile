@@ -199,6 +199,14 @@ export function AdminCategoriesPage() {
                   onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
                   placeholder="Or paste image URL"
                 />
+                {editForm.image_url.trim() ? (
+                  <ProductImage
+                    src={editForm.image_url}
+                    alt={editForm.name || 'Category'}
+                    className="aspect-[16/9] max-w-md rounded-xl"
+                    priority
+                  />
+                ) : null}
               </div>
             </Field>
             <Field label="Description">

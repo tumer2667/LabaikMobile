@@ -31,9 +31,9 @@ export function ProductImage({
 
   return (
     <div className={cn('relative overflow-hidden bg-brand-blue-soft/40', className)}>
-      {!loaded && !failed && <Skeleton className="absolute inset-0 rounded-none" />}
+      {!loaded && !failed ? <Skeleton className="absolute inset-0 rounded-none" /> : null}
       {failed ? (
-        <div className="flex h-full min-h-40 items-center justify-center bg-gradient-to-br from-brand-blue-soft to-brand-green-soft text-sm text-ink-muted">
+        <div className="flex h-full min-h-40 items-center justify-center bg-gradient-to-br from-brand-blue-soft to-brand-green-soft px-3 text-center text-sm text-ink-muted">
           Image unavailable
         </div>
       ) : (
@@ -42,12 +42,14 @@ export function ProductImage({
           src={resolved}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
+          referrerPolicy="no-referrer"
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 1.04 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          initial={false}
+          animate={{ opacity: loaded ? 1 : 0.15 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           className={cn('h-full w-full object-cover', imgClassName)}
         />
       )}
