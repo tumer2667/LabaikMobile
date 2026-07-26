@@ -19,3 +19,8 @@ class ProductStatus(StrEnum):
     DRAFT = "draft"
     ACTIVE = "active"
     ARCHIVED = "archived"
+
+
+class InvoiceStatus(StrEnum):
+    ISSUED = "issued"
+    PENDING_DELETE = "pending_delete"  # admin requested deletion; awaits super admin
