@@ -107,16 +107,16 @@ export function AdminCategoriesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-4 md:space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-semibold text-ink">Categories</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink md:text-3xl">Categories</h1>
         <p className="mt-1 text-sm text-ink-secondary">
           Edit details and toggle <strong>Show price</strong> for the storefront.
         </p>
       </div>
 
-      <Card className="flex flex-wrap items-end gap-3">
-        <label className="min-w-[220px] flex-1 text-sm font-medium text-ink">
+      <Card className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <label className="min-w-0 flex-1 text-sm font-medium text-ink">
           New category
           <input
             value={name}
@@ -126,6 +126,7 @@ export function AdminCategoriesPage() {
           />
         </label>
         <Button
+          className="w-full sm:w-auto"
           disabled={!name.trim() || createMutation.isPending}
           onClick={() => createMutation.mutate()}
         >

@@ -47,27 +47,29 @@ export function AdminDashboardPage() {
   const changes = financeQuery.data?.changes
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-6xl space-y-5 md:space-y-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue md:text-sm">
             Home
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold text-ink">
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink md:text-3xl">
             Hello, {user?.full_name || 'Admin'}
           </h1>
           <p className="mt-1 text-sm text-ink-secondary">
             {roleLabel} · Quick look at shop activity
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           {isSuperAdmin ? (
-            <Link to="/admin/finance">
-              <Button>Money report</Button>
+            <Link to="/admin/finance" className="sm:contents">
+              <Button className="w-full sm:w-auto">Money report</Button>
             </Link>
           ) : null}
-          <Link to="/admin/invoices/new">
-            <Button variant={isSuperAdmin ? 'secondary' : 'primary'}>New invoice</Button>
+          <Link to="/admin/invoices/new" className={isSuperAdmin ? 'sm:contents' : 'col-span-2 sm:contents'}>
+            <Button variant={isSuperAdmin ? 'secondary' : 'primary'} className="w-full sm:w-auto">
+              New invoice
+            </Button>
           </Link>
         </div>
       </div>
@@ -76,16 +78,16 @@ export function AdminDashboardPage() {
         <motion.section
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-border bg-[#0b1220] p-6 text-white shadow-lift"
+          className="relative overflow-hidden rounded-2xl border border-border bg-[#0b1220] p-4 text-white shadow-lift sm:p-6"
         >
           <div className="pointer-events-none absolute -right-10 -top-16 h-44 w-44 rounded-full bg-brand-blue/35 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 left-20 h-40 w-40 rounded-full bg-brand-green/25 blur-3xl" />
-          <div className="relative flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue">
+          <div className="relative flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-blue sm:text-xs">
                 This month money
               </p>
-              <p className="mt-1 text-sm text-white/60">
+              <p className="mt-1 text-xs text-white/60 sm:text-sm">
                 {financeQuery.data
                   ? `${financeQuery.data.from_date} → ${financeQuery.data.to_date}`
                   : 'Loading this month numbers…'}
@@ -93,19 +95,19 @@ export function AdminDashboardPage() {
             </div>
             <Link
               to="/admin/finance"
-              className="text-sm font-semibold text-brand-blue hover:underline"
+              className="shrink-0 text-xs font-semibold text-brand-blue hover:underline sm:text-sm"
             >
               Full report →
             </Link>
           </div>
           {financeQuery.isLoading ? (
-            <div className="relative mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full rounded-xl bg-white/10" />
+                <Skeleton key={i} className="h-20 w-full rounded-xl bg-white/10 sm:h-24" />
               ))}
             </div>
           ) : kpis ? (
-            <div className="relative mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-4">
               <MiniFinance
                 label="Revenue"
                 value={formatPkr(kpis.total_revenue_pkr)}
@@ -134,7 +136,7 @@ export function AdminDashboardPage() {
         </motion.section>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Products" value={stats.products} loading={dashQuery.isLoading} />
         <StatCard label="Categories" value={stats.categories} loading={dashQuery.isLoading} />
         <StatCard
@@ -149,9 +151,9 @@ export function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-1">
-          <h2 className="font-display text-lg font-semibold text-ink">Last login</h2>
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+        <Card className="!p-4 lg:col-span-1 md:!p-6">
+          <h2 className="font-display text-base font-semibold text-ink md:text-lg">Last login</h2>
           <p className="mt-0.5 text-sm text-ink-muted">Who signed in last</p>
           {dashQuery.isLoading ? (
             <Skeleton className="mt-4 h-24 w-full" />
@@ -175,10 +177,10 @@ export function AdminDashboardPage() {
           )}
         </Card>
 
-        <Card className="lg:col-span-1">
+        <Card className="!p-4 lg:col-span-1 md:!p-6">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h2 className="font-display text-lg font-semibold text-ink">Last activity</h2>
+              <h2 className="font-display text-base font-semibold text-ink md:text-lg">Last activity</h2>
               <p className="mt-0.5 text-sm text-ink-muted">What happened recently</p>
             </div>
           </div>
@@ -198,10 +200,10 @@ export function AdminDashboardPage() {
           )}
         </Card>
 
-        <Card className="lg:col-span-1">
+        <Card className="!p-4 lg:col-span-1 md:!p-6">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h2 className="font-display text-lg font-semibold text-ink">Last 3 invoices</h2>
+              <h2 className="font-display text-base font-semibold text-ink md:text-lg">Last 3 invoices</h2>
               <p className="mt-0.5 text-sm text-ink-muted">Newest bills</p>
             </div>
             <Link to="/admin/invoices" className="text-xs font-semibold text-brand-blue hover:underline">
@@ -347,12 +349,12 @@ function MiniFinance({
   invert?: boolean
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/50">{label}</p>
-      <p className="mt-1 font-display text-xl font-semibold tabular-nums text-white">{value}</p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur sm:p-4">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50 sm:text-[11px]">{label}</p>
+      <p className="mt-1 font-display text-lg font-semibold tabular-nums text-white sm:text-xl">{value}</p>
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5 sm:mt-2 sm:gap-2">
         <ChangePill value={change} invert={invert} />
-        {hint ? <span className="text-[11px] text-white/45">{hint}</span> : null}
+        {hint ? <span className="text-[10px] text-white/45 sm:text-[11px]">{hint}</span> : null}
       </div>
     </div>
   )
@@ -390,12 +392,12 @@ function StatCard({
   loading?: boolean
 }) {
   return (
-    <Card className="!p-5">
-      <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{label}</p>
+    <Card className="!p-3.5 sm:!p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted sm:text-xs">{label}</p>
       {loading ? (
-        <Skeleton className="mt-2 h-8 w-16" />
+        <Skeleton className="mt-2 h-7 w-14 sm:h-8 sm:w-16" />
       ) : (
-        <p className="mt-1 font-display text-3xl font-semibold text-ink">{value}</p>
+        <p className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">{value}</p>
       )}
     </Card>
   )

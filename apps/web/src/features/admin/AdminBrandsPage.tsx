@@ -60,14 +60,14 @@ export function AdminBrandsPage() {
   })
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-4 md:space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-semibold text-ink">Brands</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink md:text-3xl">Brands</h1>
         <p className="mt-1 text-sm text-ink-secondary">Create and edit brands used by products.</p>
       </div>
 
-      <Card className="flex flex-wrap items-end gap-3">
-        <label className="min-w-[220px] flex-1 text-sm font-medium text-ink">
+      <Card className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <label className="min-w-0 flex-1 text-sm font-medium text-ink">
           New brand
           <input
             value={name}
@@ -77,6 +77,7 @@ export function AdminBrandsPage() {
           />
         </label>
         <Button
+          className="w-full sm:w-auto"
           disabled={!name.trim() || createMutation.isPending}
           onClick={() => createMutation.mutate()}
         >
@@ -127,16 +128,20 @@ export function AdminBrandsPage() {
         ) : (
           <ul className="divide-y divide-border">
             {(data ?? []).map((b) => (
-              <li key={b.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                <div>
+              <li
+                key={b.id}
+                className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
                   <p className="font-medium text-ink">{b.name}</p>
                   <p className="text-xs text-ink-muted">
                     {b.slug} · {b.is_active ? 'Active' : 'Inactive'}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:w-auto">
                   <Button
                     size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => {
                       setEditing(b)
                       setEditName(b.name)
@@ -149,7 +154,7 @@ export function AdminBrandsPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="text-danger hover:bg-red-50"
+                    className="w-full text-danger hover:bg-red-50 sm:w-auto"
                     disabled={deleteMutation.isPending}
                     onClick={() => {
                       if (

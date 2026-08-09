@@ -117,13 +117,15 @@ export function AdminInvoiceDetailPage() {
   const canRequestDelete = !inReview
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="mx-auto max-w-4xl space-y-4 md:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue sm:text-sm">
             Invoice
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{invoice.number}</h1>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink md:text-3xl">
+            {invoice.number}
+          </h1>
           <p className="mt-1 text-sm text-ink-secondary">
             {formatDate(invoice.issued_at)} ·{' '}
             <span
@@ -142,19 +144,24 @@ export function AdminInvoiceDetailPage() {
             Created by {invoice.created_by_name ?? 'Unknown'}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           {!inReview ? (
-            <Link to={`/admin/invoices/${invoice.id}/print`} target="_blank">
-              <Button>Print / Download PDF</Button>
+            <Link to={`/admin/invoices/${invoice.id}/print`} target="_blank" className="col-span-2 sm:col-auto">
+              <Button className="w-full sm:w-auto">Print / Download PDF</Button>
             </Link>
           ) : null}
-          <Link to={inReview && isSuperAdmin ? '/admin/invoice-review' : '/admin/invoices'}>
-            <Button variant="secondary">Back</Button>
+          <Link
+            to={inReview && isSuperAdmin ? '/admin/invoice-review' : '/admin/invoices'}
+            className={!inReview ? undefined : 'col-span-2 sm:col-auto'}
+          >
+            <Button variant="secondary" className="w-full sm:w-auto">
+              Back
+            </Button>
           </Link>
           {canRequestDelete ? (
             <Button
               variant="ghost"
-              className="text-danger"
+              className="w-full text-danger sm:w-auto"
               disabled={requestDeleteMutation.isPending}
               onClick={() => {
                 if (
@@ -172,7 +179,7 @@ export function AdminInvoiceDetailPage() {
           {inReview && isSuperAdmin ? (
             <Button
               variant="ghost"
-              className="text-danger"
+              className="w-full text-danger sm:w-auto"
               disabled={hardDeleteMutation.isPending}
               onClick={() => {
                 if (
@@ -241,7 +248,24 @@ export function AdminInvoiceDetailPage() {
         </Card>
       </div>
 
-      <Card className="overflow-hidden !p-0">
+      <div className="space-y-2 md:hidden">
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Line items</p>
+        {invoice.lines.map((line) => (
+          <Card key={line.id} className="!p-3.5">
+            <p className="font-medium text-ink">{line.description}</p>
+            <div className="mt-2 flex items-center justify-between gap-3 text-sm text-ink-secondary">
+              <span>
+                {line.quantity} × {formatPkr(line.unit_price_pkr)}
+              </span>
+              <span className="font-semibold tabular-nums text-ink">
+                {formatPkr(line.line_total_pkr)}
+              </span>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="hidden overflow-hidden !p-0 md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-border bg-surface text-xs uppercase tracking-wider text-ink-muted">
             <tr>

@@ -75,37 +75,39 @@ export function AdminFinancePage() {
   const periodMeta = PERIODS.find((p) => p.value === period)
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-4 md:space-y-6">
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-border bg-[#0b1220] p-6 text-white shadow-lift md:p-8"
+        className="relative overflow-hidden rounded-2xl border border-border bg-[#0b1220] p-4 text-white shadow-lift sm:p-6 md:p-8"
       >
         <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-blue/30 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-brand-green/25 blur-3xl" />
-        <div className="relative flex flex-wrap items-end justify-between gap-4">
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-blue">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-blue sm:text-xs">
               Super admin · Money report
             </p>
-            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="mt-1.5 font-display text-2xl font-semibold tracking-tight sm:mt-2 sm:text-3xl md:text-4xl">
               Sales & profit
             </h1>
-            <p className="mt-2 max-w-xl text-sm text-white/65">
+            <p className="mt-2 hidden max-w-xl text-sm text-white/65 sm:block">
               See sales, money after refunds, profit, orders, and how customers paid.
             </p>
             {report ? (
-              <p className="mt-3 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
+              <p className="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium text-white/80 sm:mt-3 sm:text-xs">
                 {formatRange(report.from_date, report.to_date)} · {periodMeta?.label}
               </p>
             ) : null}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link to="/admin/invoices/new">
-              <Button className="bg-brand-blue hover:bg-brand-blue-hover">New invoice</Button>
+              <Button className="w-full bg-brand-blue hover:bg-brand-blue-hover sm:w-auto">
+                New invoice
+              </Button>
             </Link>
             <Link to="/admin/invoices">
-              <Button variant="secondary" className="text-ink">
+              <Button variant="secondary" className="w-full text-ink sm:w-auto">
                 View invoices
               </Button>
             </Link>
@@ -113,9 +115,9 @@ export function AdminFinancePage() {
         </div>
       </motion.section>
 
-      <Card className="space-y-4 !p-4 md:!p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-1.5 rounded-xl bg-surface p-1">
+      <Card className="space-y-3 !p-3 sm:space-y-4 sm:!p-4 md:!p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+          <div className="flex gap-1 overflow-x-auto rounded-xl bg-surface p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {PERIODS.map((p) => (
               <button
                 key={p.value}
@@ -126,7 +128,7 @@ export function AdminFinancePage() {
                   setToDate('')
                 }}
                 className={cn(
-                  'rounded-lg px-3.5 py-2 text-sm font-semibold transition',
+                  'shrink-0 rounded-lg px-3 py-2 text-sm font-semibold transition',
                   period === p.value
                     ? 'bg-white text-ink shadow-soft'
                     : 'text-ink-muted hover:text-ink',
@@ -183,13 +185,13 @@ export function AdminFinancePage() {
       ) : null}
 
       {reportQuery.isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-xl" />
+            <Skeleton key={i} className="h-28 w-full rounded-xl sm:h-32" />
           ))}
         </div>
       ) : kpis ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           <HeroKpi
             label="Revenue"
             value={formatPkr(kpis.total_revenue_pkr)}
@@ -311,17 +313,17 @@ function HeroKpi({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative overflow-hidden rounded-xl border border-border bg-gradient-to-br p-5 shadow-soft',
+        'relative overflow-hidden rounded-xl border border-border bg-gradient-to-br p-3.5 shadow-soft sm:p-5',
         accent,
       )}
     >
-      <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{label}</p>
-      <p className={cn('mt-2 font-display text-2xl font-semibold tabular-nums md:text-3xl', tone)}>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted sm:text-xs">{label}</p>
+      <p className={cn('mt-1.5 font-display text-xl font-semibold tabular-nums sm:mt-2 sm:text-2xl md:text-3xl', tone)}>
         {value}
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-2 flex flex-col gap-1 sm:mt-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
         <TrendBadge value={change} invert={invertTrend} />
-        <span className="text-xs text-ink-secondary">{sub}</span>
+        <span className="text-[11px] leading-snug text-ink-secondary sm:text-xs">{sub}</span>
       </div>
     </motion.div>
   )
