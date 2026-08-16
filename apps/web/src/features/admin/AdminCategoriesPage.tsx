@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 
 import type { Category } from '@/entities/catalog/types'
 import {
@@ -10,6 +10,7 @@ import {
   uploadAdminImage,
 } from '@/features/catalog/api'
 import { Card } from '@/shared/ui/Card'
+import { Modal } from '@/shared/ui/Modal'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Button } from '@/shared/ui/Button'
 import { Skeleton } from '@/shared/ui/Skeleton'
@@ -43,6 +44,12 @@ export function AdminCategoriesPage() {
     void queryClient.invalidateQueries({ queryKey: ['products'] })
   }
 
+  const closeEdit = useCallback(() => {
+    setEditing(null)
+    setEditForm(null)
+    setEditError(null)
+  }, [])
+
   const toggleMutation = useMutation({
     mutationFn: ({ id, show_price }: { id: string; show_price: boolean }) =>
       updateCategory(id, { show_price }),
@@ -72,9 +79,7 @@ export function AdminCategoriesPage() {
       })
     },
     onSuccess: () => {
-      setEditing(null)
-      setEditForm(null)
-      setEditError(null)
+      closeEdit()
       invalidate()
     },
     onError: (err) => setEditError(getApiErrorMessage(err)),
@@ -84,10 +89,7 @@ export function AdminCategoriesPage() {
     mutationFn: (id: string) => deleteCategory(id),
     onSuccess: () => {
       setError(null)
-      if (editing) {
-        setEditing(null)
-        setEditForm(null)
-      }
+      if (editing) closeEdit()
       invalidate()
     },
     onError: (err) => setError(getApiErrorMessage(err)),
@@ -135,116 +137,115 @@ export function AdminCategoriesPage() {
         {error ? <p className="w-full text-sm text-danger">{error}</p> : null}
       </Card>
 
-      {editing && editForm ? (
-        <Card className="space-y-4 border-brand-blue/30">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-xl font-semibold text-ink">Edit category</h2>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setEditing(null)
-                setEditForm(null)
-              }}
-            >
-              Close
-            </Button>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Name">
-              <input
-                className={inputClass}
-                value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-              />
-            </Field>
-            <Field label="Sort order">
-              <input
-                type="number"
-                className={inputClass}
-                value={editForm.sort_order}
-                onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value })}
-              />
-            </Field>
-            <Field label="Category image">
-              <div className="mt-1.5 space-y-2">
-                <label className="inline-flex cursor-pointer">
-                  <span className="rounded-full bg-brand-blue px-3 py-1.5 text-xs font-semibold text-white">
-                    {uploading ? 'Uploading…' : 'Upload image'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    className="hidden"
-                    disabled={uploading}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0]
-                      e.target.value = ''
-                      if (!file || !editForm) return
-                      setUploading(true)
-                      setEditError(null)
-                      try {
-                        const result = await uploadAdminImage(file, 'categories')
-                        setEditForm({ ...editForm, image_url: result.url })
-                      } catch (err) {
-                        setEditError(getApiErrorMessage(err, 'Image upload failed'))
-                      } finally {
-                        setUploading(false)
-                      }
-                    }}
-                  />
-                </label>
+      <Modal
+        open={Boolean(editing && editForm)}
+        title="Edit category"
+        onClose={closeEdit}
+      >
+        {editForm ? (
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Name">
                 <input
                   className={inputClass}
-                  value={editForm.image_url}
-                  onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
-                  placeholder="Or paste image URL"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                 />
-                {editForm.image_url.trim() ? (
-                  <ProductImage
-                    src={editForm.image_url}
-                    alt={editForm.name || 'Category'}
-                    className="aspect-[16/9] max-w-md rounded-xl"
-                    priority
+              </Field>
+              <Field label="Sort order">
+                <input
+                  type="number"
+                  className={inputClass}
+                  value={editForm.sort_order}
+                  onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value })}
+                />
+              </Field>
+              <Field label="Category image">
+                <div className="mt-1.5 space-y-2">
+                  <label className="inline-flex cursor-pointer">
+                    <span className="rounded-full bg-brand-blue px-3 py-1.5 text-xs font-semibold text-white">
+                      {uploading ? 'Uploading…' : 'Upload image'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        e.target.value = ''
+                        if (!file || !editForm) return
+                        setUploading(true)
+                        setEditError(null)
+                        try {
+                          const result = await uploadAdminImage(file, 'categories')
+                          setEditForm({ ...editForm, image_url: result.url })
+                        } catch (err) {
+                          setEditError(getApiErrorMessage(err, 'Image upload failed'))
+                        } finally {
+                          setUploading(false)
+                        }
+                      }}
+                    />
+                  </label>
+                  <input
+                    className={inputClass}
+                    value={editForm.image_url}
+                    onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
+                    placeholder="Or paste image URL"
                   />
-                ) : null}
-              </div>
-            </Field>
-            <Field label="Description">
-              <input
-                className={inputClass}
-                value={editForm.description}
-                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-              />
-            </Field>
+                  {editForm.image_url.trim() ? (
+                    <ProductImage
+                      src={editForm.image_url}
+                      alt={editForm.name || 'Category'}
+                      className="aspect-[16/9] max-w-md rounded-xl"
+                      priority
+                    />
+                  ) : null}
+                </div>
+              </Field>
+              <Field label="Description">
+                <input
+                  className={inputClass}
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                />
+              </Field>
+            </div>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={editForm.show_price}
+                  onChange={(e) => setEditForm({ ...editForm, show_price: e.target.checked })}
+                />
+                Show price on website
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={editForm.is_active}
+                  onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
+                />
+                Active
+              </label>
+            </div>
+            {editError ? <p className="text-sm text-danger">{editError}</p> : null}
+            <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+              <Button variant="secondary" className="w-full sm:w-auto" onClick={closeEdit}>
+                Cancel
+              </Button>
+              <Button
+                className="w-full sm:w-auto"
+                disabled={updateMutation.isPending || !editForm.name.trim()}
+                onClick={() => updateMutation.mutate()}
+              >
+                {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={editForm.show_price}
-                onChange={(e) => setEditForm({ ...editForm, show_price: e.target.checked })}
-              />
-              Show price on website
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={editForm.is_active}
-                onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
-              />
-              Active
-            </label>
-          </div>
-          {editError ? <p className="text-sm text-danger">{editError}</p> : null}
-          <Button
-            disabled={updateMutation.isPending || !editForm.name.trim()}
-            onClick={() => updateMutation.mutate()}
-          >
-            {updateMutation.isPending ? 'Saving…' : 'Save changes'}
-          </Button>
-        </Card>
-      ) : null}
+        ) : null}
+      </Modal>
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

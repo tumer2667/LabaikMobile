@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 
 import type { Brand } from '@/entities/catalog/types'
 import { createBrand, deleteBrand, fetchAdminBrands, updateBrand } from '@/features/catalog/api'
 import { Card } from '@/shared/ui/Card'
+import { Modal } from '@/shared/ui/Modal'
 import { Button } from '@/shared/ui/Button'
 import { Skeleton } from '@/shared/ui/Skeleton'
 import { getApiErrorMessage } from '@/shared/api/client'
@@ -26,6 +27,11 @@ export function AdminBrandsPage() {
     void queryClient.invalidateQueries({ queryKey: ['brands'] })
   }
 
+  const closeEdit = useCallback(() => {
+    setEditing(null)
+    setEditError(null)
+  }, [])
+
   const createMutation = useMutation({
     mutationFn: () => createBrand({ name }),
     onSuccess: () => {
@@ -42,8 +48,7 @@ export function AdminBrandsPage() {
       return updateBrand(editing.id, { name: editName.trim(), is_active: editActive })
     },
     onSuccess: () => {
-      setEditing(null)
-      setEditError(null)
+      closeEdit()
       invalidate()
     },
     onError: (err) => setEditError(getApiErrorMessage(err)),
@@ -53,7 +58,7 @@ export function AdminBrandsPage() {
     mutationFn: (id: string) => deleteBrand(id),
     onSuccess: () => {
       setError(null)
-      setEditing(null)
+      closeEdit()
       invalidate()
     },
     onError: (err) => setError(getApiErrorMessage(err)),
@@ -86,14 +91,13 @@ export function AdminBrandsPage() {
         {error ? <p className="w-full text-sm text-danger">{error}</p> : null}
       </Card>
 
-      {editing ? (
-        <Card className="space-y-4 border-brand-blue/30">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl font-semibold text-ink">Edit brand</h2>
-            <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>
-              Close
-            </Button>
-          </div>
+      <Modal
+        open={Boolean(editing)}
+        title="Edit brand"
+        onClose={closeEdit}
+        className="sm:max-w-md"
+      >
+        <div className="space-y-4">
           <Field label="Name">
             <input
               className="mt-1.5 w-full rounded-xl border border-border px-3 py-2.5 text-sm outline-none focus:border-brand-blue"
@@ -110,14 +114,20 @@ export function AdminBrandsPage() {
             Active
           </label>
           {editError ? <p className="text-sm text-danger">{editError}</p> : null}
-          <Button
-            disabled={updateMutation.isPending || !editName.trim()}
-            onClick={() => updateMutation.mutate()}
-          >
-            Save changes
-          </Button>
-        </Card>
-      ) : null}
+          <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+            <Button variant="secondary" className="w-full sm:w-auto" onClick={closeEdit}>
+              Cancel
+            </Button>
+            <Button
+              className="w-full sm:w-auto"
+              disabled={updateMutation.isPending || !editName.trim()}
+              onClick={() => updateMutation.mutate()}
+            >
+              {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Card className="overflow-hidden !p-0">
         {isLoading ? (

@@ -101,23 +101,17 @@ export function AdminDashboardPage() {
             </Link>
           </div>
           {financeQuery.isLoading ? (
-            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
+            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-20 w-full rounded-xl bg-white/10 sm:h-24" />
               ))}
             </div>
           ) : kpis ? (
-            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-4">
+            <div className="relative mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 lg:grid-cols-3">
               <MiniFinance
                 label="Revenue"
                 value={formatPkr(kpis.total_revenue_pkr)}
                 change={changes?.revenue_pct}
-              />
-              <MiniFinance
-                label="Profit"
-                value={formatPkr(kpis.total_profit_pkr)}
-                change={changes?.profit_pct}
-                hint={`${kpis.margin_pct.toFixed(1)}% margin`}
               />
               <MiniFinance
                 label="Orders"
