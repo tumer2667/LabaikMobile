@@ -5,7 +5,7 @@ import { useRef } from 'react'
 
 import { fetchCategories, fetchProducts } from '@/features/catalog/api'
 import { CategoryCard } from '@/features/catalog/components/CategoryCard'
-import { ProductCard } from '@/features/catalog/components/ProductCard'
+import { FeaturedProductsCarousel } from '@/features/home/components/FeaturedProductsCarousel'
 import { appConfig } from '@/shared/config/env'
 import { Button } from '@/shared/ui/Button'
 import { ProductImage } from '@/shared/ui/ProductImage'
@@ -136,6 +136,11 @@ export function HomePage() {
         </motion.div>
       </section>
 
+      <FeaturedProductsCarousel
+        products={featured}
+        isLoading={featuredQuery.isLoading}
+      />
+
       <section className="relative border-b border-border/60 bg-surface-elevated/55 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid items-stretch gap-4 sm:grid-cols-3 sm:gap-5">
@@ -190,48 +195,6 @@ export function HomePage() {
               {categories.map((category, index) => (
                 <Reveal key={category.id} delay={index * 0.04}>
                   <CategoryCard category={category} priority={index < 4} />
-                </Reveal>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden border-y border-border bg-surface-elevated/80 py-20 sm:py-24">
-        <div className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-brand-green/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-brand-blue/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <Reveal>
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
-                  Popular
-                </p>
-                <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                  Top picks for you
-                </h2>
-                <p className="mt-2 text-ink-secondary">
-                  Popular products people ask for the most.
-                </p>
-              </div>
-              <Link to="/shop">
-                <Button variant="secondary" size="sm">
-                  See all
-                </Button>
-              </Link>
-            </div>
-          </Reveal>
-          {featuredQuery.isLoading ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {featured.map((product, index) => (
-                <Reveal key={product.id} delay={index * 0.05} className="h-full">
-                  <ProductCard product={product} />
                 </Reveal>
               ))}
             </div>
