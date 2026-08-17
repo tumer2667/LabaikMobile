@@ -1,20 +1,26 @@
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
-import { fetchCategories, fetchProducts } from '@/features/catalog/api'
+import { fetchBrands, fetchCategories, fetchProducts } from '@/features/catalog/api'
 import { CategoryCard } from '@/features/catalog/components/CategoryCard'
 import { FeaturedProductsCarousel } from '@/features/home/components/FeaturedProductsCarousel'
+import { HomeBrandProducts } from '@/features/home/components/HomeBrandProducts'
+import { businessInfo, mapsOpenUrl, whatsappUrl } from '@/shared/config/business'
 import { appConfig } from '@/shared/config/env'
 import { Button } from '@/shared/ui/Button'
 import { ProductImage } from '@/shared/ui/ProductImage'
 import { Reveal } from '@/shared/ui/Reveal'
 import { Skeleton } from '@/shared/ui/Skeleton'
+import { StoreMap } from '@/shared/ui/StoreMap'
 import { fadeUp, staggerContainer } from '@/shared/lib/motion'
 
 const heroImage =
   'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=70&fm=webp'
+
+const orderHelpImage =
+  'https://images.unsplash.com/photo-1556656793-08538906a9f8?auto=format&fit=crop&w=1400&q=70&fm=webp'
 
 const trustItems = [
   {
@@ -34,6 +40,39 @@ const trustItems = [
   },
 ] as const
 
+const orderSteps = [
+  {
+    step: '01',
+    title: 'Browse the shop',
+    copy: 'Open categories, compare phones and accessories, and note what you like.',
+  },
+  {
+    step: '02',
+    title: 'Message or call',
+    copy: 'WhatsApp us the product — or visit the shop in Karim Park, Lahore.',
+  },
+  {
+    step: '03',
+    title: 'We finish the order',
+    copy: 'We confirm stock, share the final price, and help you buy with confidence.',
+  },
+] as const
+
+const homeFaqs = [
+  {
+    q: 'How do I buy?',
+    a: 'See products online, then WhatsApp, call, or visit us. There is no cart checkout on the website — we help you place the order directly.',
+  },
+  {
+    q: 'Why do some items say “Contact for price”?',
+    a: 'For some products we share the price when you ask. Message us and we will tell you quickly.',
+  },
+  {
+    q: 'Where is your shop?',
+    a: `${businessInfo.address} Call ${businessInfo.phones[0].display} or ${businessInfo.phones[1].display}.`,
+  },
+] as const
+
 export function HomePage() {
   const heroRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
@@ -44,16 +83,24 @@ export function HomePage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.35])
 
   const categoriesQuery = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
+  const brandsQuery = useQuery({ queryKey: ['brands'], queryFn: fetchBrands })
   const featuredQuery = useQuery({
     queryKey: ['products', 'featured'],
     queryFn: () => fetchProducts({ featured: true, page_size: 8 }),
   })
 
   const categories = categoriesQuery.data ?? []
+  const brands = brandsQuery.data ?? []
   const featured = featuredQuery.data?.items ?? []
+  const primaryPhone = businessInfo.phones[0]
+  const whatsappHref = whatsappUrl(
+    primaryPhone.whatsapp,
+    'Assalam o Alaikum! I want help choosing a product from LabaikMobiles.',
+  )
 
   return (
     <div>
+      {/* Hero */}
       <section ref={heroRef} className="relative min-h-[88vh] overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
           <ProductImage
@@ -141,6 +188,7 @@ export function HomePage() {
         isLoading={featuredQuery.isLoading}
       />
 
+      {/* Trust */}
       <section className="relative border-b border-border/60 bg-surface-elevated/55 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid items-stretch gap-4 sm:grid-cols-3 sm:gap-5">
@@ -161,6 +209,59 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* How ordering works — reduces friction for contact-to-order */}
+      <section className="relative overflow-hidden bg-[#0b1220] py-20 text-white sm:py-24">
+        <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/25 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-brand-green/20 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <Reveal>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+              How it works
+            </p>
+            <h2 className="mt-2 max-w-xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              No online cart. Just a clear path to buy.
+            </h2>
+            <p className="mt-3 max-w-lg text-white/65">
+              Browse here, then talk to us. We check stock and guide you to the right product.
+            </p>
+          </Reveal>
+
+          <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
+            {orderSteps.map((item, index) => (
+              <Reveal key={item.step} delay={index * 0.08}>
+                <div className="relative border-t border-white/15 pt-6">
+                  <p className="font-display text-4xl font-semibold text-brand-blue/90">{item.step}</p>
+                  <h3 className="mt-4 font-display text-xl font-semibold tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/65">{item.copy}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.15}>
+            <div className="mt-12 flex flex-wrap gap-3">
+              <Link to="/shop">
+                <Button size="lg" variant="gradient">
+                  Start browsing
+                </Button>
+              </Link>
+              <a href={whatsappHref} target="_blank" rel="noreferrer">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+                >
+                  WhatsApp us
+                </Button>
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Categories */}
       <section className="py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
@@ -201,6 +302,198 @@ export function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Help choosing — visual + CTA */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <ProductImage
+            src={orderHelpImage}
+            alt=""
+            className="h-full min-h-[28rem] w-full sm:min-h-[32rem]"
+            imgClassName="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-ink/75" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-ink/40" />
+        </div>
+        <div className="relative mx-auto flex min-h-[28rem] max-w-6xl items-center px-4 py-20 sm:min-h-[32rem] sm:px-6 sm:py-24">
+          <Reveal>
+            <div className="max-w-xl text-white">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
+                Not sure what to buy?
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.08]">
+                Tell us what you need. We’ll help you choose.
+              </h2>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-white/72">
+                Budget, phone model, charger type — send a quick message and we’ll recommend the
+                right item from stock.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href={whatsappHref} target="_blank" rel="noreferrer">
+                  <Button size="lg" variant="gradient">
+                    Ask on WhatsApp
+                  </Button>
+                </a>
+                <a href={`tel:${primaryPhone.tel}`}>
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    className="border-white/25 bg-white/10 text-white hover:bg-white/20"
+                  >
+                    Call {primaryPhone.display}
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Brands stripe + products on home */}
+      <HomeBrandProducts brands={brands} brandsLoading={brandsQuery.isLoading} />
+
+      {/* Visit the shop */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <Reveal>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-green">
+                  Visit us
+                </p>
+                <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                  Come to the shop in Karim Park
+                </h2>
+                <p className="mt-3 text-ink-secondary">
+                  See products in person, ask questions, and take what you need the same day when
+                  stock allows.
+                </p>
+                <div className="mt-6 space-y-3 text-sm">
+                  <p className="font-medium text-ink">{businessInfo.address}</p>
+                  <p className="text-ink-secondary">
+                    {businessInfo.phones.map((p) => p.display).join(' · ')}
+                  </p>
+                </div>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <a href={mapsOpenUrl()} target="_blank" rel="noreferrer">
+                    <Button variant="gradient">Open in Maps</Button>
+                  </a>
+                  <Link to="/contact">
+                    <Button variant="secondary">Contact details</Button>
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <StoreMap />
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ teaser */}
+      <section className="border-t border-border/60 bg-surface-elevated/55 py-20 sm:py-24">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <Reveal>
+            <div className="mb-10 text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+                FAQ
+              </p>
+              <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Quick answers
+              </h2>
+              <p className="mt-2 text-ink-secondary">
+                The questions people ask before they message us.
+              </p>
+            </div>
+          </Reveal>
+          <div className="divide-y divide-border rounded-2xl border border-border bg-surface-elevated shadow-soft">
+            {homeFaqs.map((item, index) => (
+              <FaqItem key={item.q} question={item.q} answer={item.a} defaultOpen={index === 0} />
+            ))}
+          </div>
+          <Reveal delay={0.1}>
+            <div className="mt-8 text-center">
+              <Link
+                to="/faq"
+                className="text-sm font-semibold text-brand-blue transition hover:text-brand-blue-hover"
+              >
+                See all FAQ →
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section className="relative overflow-hidden bg-[#0b1220] py-16 text-white sm:py-20">
+        <div className="pointer-events-none absolute inset-0 bg-brand-gradient opacity-[0.12]" />
+        <div className="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
+          <Reveal>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue">
+              Ready when you are
+            </p>
+            <h2 className="mx-auto mt-3 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              Find what you need — then talk to {appConfig.name}
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-white/65">
+              Browse the catalog, send a WhatsApp, or walk into the shop. We’ll take it from there.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link to="/shop">
+                <Button size="lg" variant="gradient">
+                  Browse shop
+                </Button>
+              </Link>
+              <a href={whatsappHref} target="_blank" rel="noreferrer">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+                >
+                  WhatsApp now
+                </Button>
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function FaqItem({
+  question,
+  answer,
+  defaultOpen = false,
+}: {
+  question: string
+  answer: string
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  return (
+    <div className="px-5 py-4 sm:px-6">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-4 text-left"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="font-display text-base font-semibold text-ink sm:text-lg">{question}</span>
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-lg leading-none text-ink-secondary transition ${
+            open ? 'rotate-45 bg-brand-blue text-white border-brand-blue' : ''
+          }`}
+          aria-hidden
+        >
+          +
+        </span>
+      </button>
+      {open ? (
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-secondary">{answer}</p>
+      ) : null}
     </div>
   )
 }

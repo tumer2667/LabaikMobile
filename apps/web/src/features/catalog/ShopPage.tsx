@@ -15,7 +15,7 @@ type SortKey = 'featured' | 'price-asc' | 'price-desc' | 'rating'
 export function ShopPage() {
   const [params, setParams] = useSearchParams()
   const category = params.get('category') ?? 'all'
-  const [brand, setBrand] = useState<string>('all')
+  const brand = params.get('brand') ?? 'all'
   const [inStockOnly, setInStockOnly] = useState(false)
   const [sort, setSort] = useState<SortKey>('featured')
   const [query, setQuery] = useState('')
@@ -53,6 +53,13 @@ export function ShopPage() {
         setSort('featured')
       }
     }
+  }
+
+  const setBrand = (slug: string) => {
+    const next = new URLSearchParams(params)
+    if (slug === 'all') next.delete('brand')
+    else next.set('brand', slug)
+    setParams(next, { replace: true })
   }
 
   return (
