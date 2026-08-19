@@ -69,7 +69,7 @@ const homeFaqs = [
   },
   {
     q: 'Where is your shop?',
-    a: `${businessInfo.address} Call ${businessInfo.phones[0].display} or ${businessInfo.phones[1].display}.`,
+    a: `${businessInfo.address} Call or WhatsApp ${businessInfo.phones[0].display}.`,
   },
 ] as const
 

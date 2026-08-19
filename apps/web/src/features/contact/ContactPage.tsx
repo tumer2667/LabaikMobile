@@ -30,7 +30,6 @@ export function ContactPage() {
     interest ? `Order: ${interest}` : 'Order enquiry',
   )}`
   const primary = businessInfo.phones[0]
-  const secondary = businessInfo.phones[1]
   const whatsappHref = hasProduct
     ? orderWhatsAppHref({
         productName: state.productName!,
@@ -55,7 +54,7 @@ export function ContactPage() {
     {
       label: 'Call',
       detail: primary.display,
-      hint: `Also ${secondary.display}`,
+      hint: 'Call this number',
       href: `tel:${primary.tel}`,
       external: false,
       tone: 'blue' as const,
@@ -168,19 +167,6 @@ export function ContactPage() {
               </Reveal>
             ))}
           </div>
-
-          <Reveal delay={0.12}>
-            <div className="mt-4 rounded-3xl border border-dashed border-border-strong bg-white/40 px-5 py-4 text-sm text-ink-secondary backdrop-blur-sm">
-              Prefer another number? Call or WhatsApp{' '}
-              <a
-                href={`tel:${secondary.tel}`}
-                className="font-semibold text-brand-blue hover:text-brand-blue-hover"
-              >
-                {secondary.display}
-              </a>
-              .
-            </div>
-          </Reveal>
         </div>
       </section>
 

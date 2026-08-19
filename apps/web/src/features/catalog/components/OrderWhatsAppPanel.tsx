@@ -11,7 +11,6 @@ type OrderWhatsAppPanelProps = {
 
 export function OrderWhatsAppPanel({ order, inStock, className }: OrderWhatsAppPanelProps) {
   const primary = businessInfo.phones[0]
-  const secondary = businessInfo.phones[1]
   const whatsappHref = orderWhatsAppHref(order)
   const askPrice = order.askForPrice || order.showPrice === false
 
@@ -73,9 +72,8 @@ export function OrderWhatsAppPanel({ order, inStock, className }: OrderWhatsAppP
         </p>
       ) : (
         <p className="mt-3 text-xs text-ink-muted">
-          Message goes to {primary.display}
-          {secondary ? ` (or ${secondary.display})` : ''}. Product name, color, and price are
-          included automatically.
+          Message goes to {primary.display}. Product name, color, and price are included
+          automatically.
         </p>
       )}
     </div>

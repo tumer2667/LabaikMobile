@@ -1,5 +1,7 @@
-import { Reveal } from '@/shared/ui/Reveal'
 import { Link } from 'react-router-dom'
+
+import { businessInfo } from '@/shared/config/business'
+import { Reveal } from '@/shared/ui/Reveal'
 import { Button } from '@/shared/ui/Button'
 
 export function FaqPage() {
@@ -14,8 +16,8 @@ export function FaqPage() {
           <div>
             <h2 className="font-display text-lg font-semibold text-ink">Where is your shop?</h2>
             <p className="mt-2">
-              Shop # 5, Block # 1, Near Ali Computer College, Karim Park, Lahore. Call 0307 8600067
-              or 0300 0065558, or message us on WhatsApp.
+              Shop # 5, Block # 1, Near Ali Computer College, Karim Park, Lahore. Call or WhatsApp{' '}
+              {businessInfo.phones[0].display}.
             </p>
           </div>
           <div>

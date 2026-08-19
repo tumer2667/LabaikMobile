@@ -29,9 +29,13 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     api_prefix: str = "/api/v1"
 
-    # Comma-separated origins, e.g. http://localhost:5173,https://labaik-mobile.vercel.app
+    # Comma-separated origins. Always include the live custom domain.
     cors_origins_raw: str = Field(
-        default="http://localhost:5173,http://127.0.0.1:5173",
+        default=(
+            "http://localhost:5173,http://127.0.0.1:5173,"
+            "https://labaikmobiles.pk,https://www.labaikmobiles.pk,"
+            "https://labaik-mobile.vercel.app"
+        ),
         alias="CORS_ORIGINS",
     )
 

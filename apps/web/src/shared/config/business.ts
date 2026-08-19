@@ -9,8 +9,7 @@ export const businessInfo = {
     'Karim Park, Lahore',
   ] as const,
   phones: [
-    { display: '0307 8600067', tel: '+923078600067', whatsapp: '923078600067' },
-    { display: '0300 0065558', tel: '+923000065558', whatsapp: '923000065558' },
+    { display: '0321 1431694', tel: '+923211431694', whatsapp: '923211431694' },
   ] as const,
   /** Exact shop pin — Karim Park, Lahore */
   coordinates: {
